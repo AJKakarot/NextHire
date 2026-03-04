@@ -16,27 +16,22 @@
 ## Architecture
 
 ```mermaid
-flowchart LR
-    subgraph Client
+flowchart TB
+    subgraph Client[" "]
         FE[Next.js]
-    end
-    subgraph Backend
-        direction LR
-        AUTH[Auth] --- USER[User] --- JOB[Job] --- PAY[Payment] --- UTILS[Utils]
-    end
-    subgraph Data
-        direction LR
-        NEON[(Neon)] --- REDIS[(Redis)] --- KAFKA[Kafka]
-    end
-    subgraph External
-        direction LR
-        CLOUD[Cloudinary] --- RAZOR[Razorpay] --- GEMINI[Gemini]
     end
     FE --> AUTH
     FE --> USER
     FE --> JOB
     FE --> PAY
     FE --> UTILS
+    subgraph Backend["Backend"]
+        AUTH[Auth]
+        USER[User]
+        JOB[Job]
+        PAY[Payment]
+        UTILS[Utils]
+    end
     AUTH --> NEON
     AUTH --> REDIS
     AUTH --> KAFKA
@@ -45,9 +40,20 @@ flowchart LR
     JOB --> NEON
     JOB --> KAFKA
     PAY --> NEON
+    PAY --> RAZOR
     UTILS --> KAFKA
     UTILS --> CLOUD
     UTILS --> GEMINI
+    subgraph Data["Data & Messaging"]
+        NEON[(Neon)]
+        REDIS[(Redis)]
+        KAFKA[Kafka]
+    end
+    subgraph External["External"]
+        CLOUD[Cloudinary]
+        RAZOR[Razorpay]
+        GEMINI[Gemini]
+    end
 ```
 
 ---
