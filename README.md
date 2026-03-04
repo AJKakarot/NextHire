@@ -21,28 +21,33 @@ flowchart LR
         FE[Next.js]
     end
     subgraph Backend
-        AUTH[Auth]
-        USER[User]
-        JOB[Job]
-        PAY[Payment]
-        UTILS[Utils]
+        direction LR
+        AUTH[Auth] --- USER[User] --- JOB[Job] --- PAY[Payment] --- UTILS[Utils]
     end
     subgraph Data
-        NEON[(Neon)]
-        REDIS[(Redis)]
-        KAFKA[Kafka]
+        direction LR
+        NEON[(Neon)] --- REDIS[(Redis)] --- KAFKA[Kafka]
     end
     subgraph External
-        CLOUD[Cloudinary]
-        RAZOR[Razorpay]
-        GEMINI[Gemini]
+        direction LR
+        CLOUD[Cloudinary] --- RAZOR[Razorpay] --- GEMINI[Gemini]
     end
-    FE --> AUTH & USER & JOB & PAY & UTILS
-    AUTH --> NEON & REDIS & KAFKA
-    USER --> NEON & KAFKA
-    JOB --> NEON & KAFKA
+    FE --> AUTH
+    FE --> USER
+    FE --> JOB
+    FE --> PAY
+    FE --> UTILS
+    AUTH --> NEON
+    AUTH --> REDIS
+    AUTH --> KAFKA
+    USER --> NEON
+    USER --> KAFKA
+    JOB --> NEON
+    JOB --> KAFKA
     PAY --> NEON
-    UTILS --> KAFKA & CLOUD & GEMINI
+    UTILS --> KAFKA
+    UTILS --> CLOUD
+    UTILS --> GEMINI
 ```
 
 ---
