@@ -62,13 +62,13 @@ export const LANDING_FEATURES: readonly LandingFeatureItem[] = [
     tag: "Guide",
     title: "AI career guide",
     description:
-      "Add your skills—we generate a structured path and milestones with Gemini.",
+      "Add your skills—we generate a structured path and milestones with Gemini/Groq.",
     layout: "default",
   },
   {
     icon: "✦",
     tag: "Pro",
-    title: "Priority + Gemini polish",
+    title: "Priority + Gemini/Groq polish",
     description:
       "Paid plans add application visibility, premium support, and deeper AI insights.",
     layout: "pro",

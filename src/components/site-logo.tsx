@@ -10,8 +10,8 @@ const SiteLogo = ({
   href?: string;
 }) => (
   <Link href={href} className={cn(logoClass, "inline-block", className)}>
-    <span className="text-white">Next</span>
-    <span className="font-semibold text-orange-500">Hire</span>
+    <span className="text-ink">Next</span>
+    <span className="font-semibold text-brand">Hire</span>
   </Link>
 );
 

@@ -7,7 +7,7 @@ const Loading = () => {
         {[0, 1, 2].map((i) => (
           <span
             key={i}
-            className="h-2.5 w-2.5 animate-pulse rounded-full bg-orange-500"
+            className="h-2.5 w-2.5 animate-pulse rounded-full bg-brand"
             style={{ animationDelay: `${i * 0.15}s` }}
           />
         ))}

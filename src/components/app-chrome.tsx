@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import NavBar from "./navbar";
 import SiteFooter from "./site-footer";
@@ -11,6 +12,15 @@ export default function AppChrome({ children }: { children: React.ReactNode }) {
   const minimal = MINIMAL_CHROME_ROUTES.some((route) =>
     pathname.startsWith(route)
   );
+
+  useEffect(() => {
+    if (!("serviceWorker" in navigator)) return;
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      registrations.forEach((registration) => {
+        void registration.unregister();
+      });
+    });
+  }, []);
 
   if (minimal) {
     return <main className="relative z-10 flex-1">{children}</main>;

@@ -11,13 +11,13 @@ import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
 
 const navLinkClass =
-  "shrink-0 cursor-pointer whitespace-nowrap px-3 py-2 text-sm font-medium text-zinc-400 transition-colors hover:text-white";
+  "shrink-0 cursor-pointer whitespace-nowrap px-3 py-2 text-sm font-medium text-mute transition-colors hover:text-ink";
 
 const loginBtnClass =
-  "h-9 rounded-full border border-white/15 bg-white/[0.06] px-4 text-xs font-medium text-white shadow-none transition-all hover:border-white/25 hover:bg-white/[0.1] sm:h-10 sm:px-5 sm:text-sm";
+  "h-9 rounded-full border border-line bg-elevated px-4 text-xs font-medium text-ink shadow-none transition-all hover:border-brand/40 hover:bg-elevated sm:h-10 sm:px-5 sm:text-sm";
 
 const signupBtnClass =
-  "h-9 rounded-full border-0 bg-orange-500 px-4 text-xs font-medium text-black shadow-none transition-all hover:bg-orange-400 sm:h-10 sm:px-5 sm:text-sm";
+  "h-9 rounded-full border-0 bg-brand px-4 text-xs font-medium text-ink shadow-none transition-all hover:bg-brand-hover sm:h-10 sm:px-5 sm:text-sm";
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,11 +27,10 @@ const NavBar = () => {
   const isRecruiter = isAuth && user?.role === "recruiter";
 
   const navLinks = isRecruiter
-    ? [{ href: "/jobs", label: "Browse Jobs" }]
+    ? []
     : [
         { href: "/features", label: "Features" },
         { href: "/subscribe", label: "Pricing" },
-        { href: "/jobs", label: "Browse Jobs" },
       ];
 
   useEffect(() => {
@@ -45,8 +44,8 @@ const NavBar = () => {
     <header
       id="site-navbar"
       className={cn(
-        "sticky top-0 z-50 w-full border-b border-white/[0.06] backdrop-blur-md transition-all duration-300 ease-out",
-        scrolled ? "bg-black/80" : "bg-black/60"
+        "sticky top-0 z-50 w-full border-b border-line backdrop-blur-md transition-all duration-300 ease-out",
+        scrolled ? "bg-canvas/90" : "bg-canvas/70"
       )}
     >
       <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:px-6">
@@ -63,8 +62,10 @@ const NavBar = () => {
           ))}
         </nav>
 
-        <div className="hidden shrink-0 items-center gap-2 md:flex">
-          {!loading && (
+        <div className="hidden h-10 min-w-[148px] shrink-0 items-center justify-end gap-2 md:flex">
+          {loading ? (
+            <div className="h-10 w-[148px] rounded-full bg-elevated" />
+          ) : (
             <>
               {isAuth ? (
                 <Popover>
@@ -82,14 +83,14 @@ const NavBar = () => {
                     </button>
                   </PopoverTrigger>
                   <PopoverContent
-                    className="w-56 border-white/10 bg-[#0c0f18] p-2"
+                    className="w-56 border-line bg-elevated p-2"
                     align="end"
                   >
-                    <div className="mb-2 border-b border-white/10 px-3 py-2">
-                      <p className="text-sm font-semibold text-white">
+                    <div className="mb-2 border-b border-line px-3 py-2">
+                      <p className="text-sm font-semibold text-ink">
                         {user && user.name}
                       </p>
-                      <p className="truncate text-xs text-zinc-500">
+                      <p className="truncate text-xs text-mute">
                         {user && user.email}
                       </p>
                     </div>
@@ -138,11 +139,11 @@ const NavBar = () => {
 
       <div
         className={cn(
-          "overflow-hidden border-t border-white/10 transition-all duration-300 ease-out md:hidden",
+          "overflow-hidden border-t border-line transition-all duration-300 ease-out md:hidden",
           isOpen ? "max-h-[28rem] opacity-100" : "max-h-0 opacity-0"
         )}
       >
-        <div className="space-y-1 bg-black/95 px-4 py-3 backdrop-blur-md">
+        <div className="space-y-1 bg-canvas px-4 py-3 backdrop-blur-md">
           {navLinks.map(({ href, label }) => (
             <Link key={href} href={href} onClick={() => setIsOpen(false)}>
               <Button variant="ghost" className="h-11 w-full justify-start">
@@ -159,7 +160,7 @@ const NavBar = () => {
               </Link>
               <Button
                 variant="ghost"
-                className="h-11 w-full justify-start gap-3 text-rose-400"
+                className="h-11 w-full justify-start gap-3 text-danger"
                 onClick={() => {
                   logoutUser();
                   setIsOpen(false);

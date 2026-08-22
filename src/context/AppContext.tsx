@@ -241,7 +241,28 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       }}
     >
       {children}
-      <Toaster />
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          duration: 3200,
+          style: {
+            background: "#18181b",
+            color: "#f4f4f5",
+            border: "1px solid rgba(255,255,255,0.12)",
+            borderRadius: "12px",
+            boxShadow: "0 12px 40px rgba(0,0,0,0.45)",
+          },
+          success: {
+            iconTheme: { primary: "#f97316", secondary: "#18181b" },
+          },
+          error: {
+            iconTheme: { primary: "#fb7185", secondary: "#18181b" },
+          },
+          loading: {
+            iconTheme: { primary: "#f97316", secondary: "#18181b" },
+          },
+        }}
+      />
     </AppContext.Provider>
   );
 };

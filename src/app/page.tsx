@@ -1,15 +1,16 @@
 "use client";
 
 import Hero from "@/components/hero";
-import Loading from "@/components/loading";
 import PageBackground from "@/components/page-background";
-import ResumeAnalyzer from "@/components/resume-analyser";
+import ResumeAnalyzer, {
+  type ResumeAnalyzerHandle,
+} from "@/components/resume-analyser";
 import { Button } from "@/components/ui/button";
 import { useAppData } from "@/context/AppContext";
 import React from "react";
 
 const startBtn =
-  "h-12 rounded-full border-0 bg-orange-500 px-10 text-sm font-medium text-black shadow-none transition-all hover:scale-[1.03] hover:bg-orange-400";
+  "h-12 rounded-full border-0 bg-brand px-10 text-sm font-medium text-ink shadow-none transition-all hover:scale-[1.03] hover:bg-brand-hover";
 
 const TRUSTED_TEAMS = [
   "ACME",
@@ -20,22 +21,32 @@ const TRUSTED_TEAMS = [
 ];
 
 const Home = () => {
-  const { loading, isAuth, user } = useAppData();
+  const { isAuth, user } = useAppData();
   const isRecruiter = isAuth && user?.role === "recruiter";
-
-  if (loading) return <Loading />;
+  const [targetJob, setTargetJob] = React.useState("");
+  const [jobDescription, setJobDescription] = React.useState("");
+  const [polish, setPolish] = React.useState(true);
+  const analyzerRef = React.useRef<ResumeAnalyzerHandle>(null);
 
   return (
-    <div className="relative bg-black">
+    <div className="relative bg-canvas">
       <PageBackground />
-      <Hero />
+      <Hero
+        targetJob={targetJob}
+        jobDescription={jobDescription}
+        polish={polish}
+        onTargetJobChange={setTargetJob}
+        onJobDescriptionChange={setJobDescription}
+        onPolishChange={setPolish}
+        onUploadResume={() => analyzerRef.current?.openFilePicker()}
+      />
 
       {isRecruiter ? (
         <section className="mx-auto max-w-3xl px-4 pb-20 pt-4 text-center sm:px-6">
-          <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-            See what&apos;s hiring in the market
-          </h2>
-          <p className="mx-auto mt-3 max-w-md text-sm text-zinc-400">
+            <h2 className="text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+              See what&apos;s hiring in the market
+            </h2>
+            <p className="mx-auto mt-3 max-w-md text-sm text-mute">
             Browse open roles. Post jobs and review applicants from your
             companies — applicants apply; you hire.
           </p>
@@ -51,29 +62,38 @@ const Home = () => {
             className="mx-auto max-w-3xl px-4 pb-2 sm:px-6"
             aria-label="Resume analysis pipeline"
           >
-            <p className="mb-3 text-center text-sm font-medium tracking-tight text-zinc-500">
+            <p className="mb-3 text-center text-sm font-medium tracking-tight text-mute md:text-base">
               Pipeline — upload to run
             </p>
             <div id="resume-analyzer" className="scroll-mt-24">
-              <ResumeAnalyzer embedded />
+              <ResumeAnalyzer
+                ref={analyzerRef}
+                embedded
+                polish={polish}
+                targetJob={targetJob}
+                jobDescription={jobDescription}
+              />
             </div>
           </section>
 
           <section className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
             <div className="flex flex-col items-center gap-5 text-center">
-              <p className="text-sm font-medium text-orange-500/95">
-                1,000+ resumes analyzed successfully
+              <p className="w-full text-center text-sm leading-normal text-mute">
+                <span className="font-semibold tabular-nums text-brand">
+                  1,000+
+                </span>{" "}
+                resumes analyzed successfully
               </p>
 
               <div className="w-full">
-                <p className="mb-3 text-xs font-medium tracking-tight text-zinc-500 sm:text-sm">
+                <p className="mb-3 text-xs font-medium tracking-tight text-mute sm:text-sm">
                   Trusted by teams at
                 </p>
                 <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
                   {TRUSTED_TEAMS.map((name) => (
                     <span
                       key={name}
-                      className="rounded-lg border border-white/10 bg-white/[0.04] px-4 py-2 text-[10px] font-medium uppercase tracking-wider text-zinc-500 sm:px-5 sm:py-2.5 sm:text-xs"
+                      className="rounded-lg border border-line bg-elevated px-4 py-2 text-[10px] font-medium uppercase tracking-wider text-mute sm:px-5 sm:py-2.5 sm:text-xs"
                     >
                       {name}
                     </span>
@@ -84,7 +104,7 @@ const Home = () => {
           </section>
 
           <section className="mx-auto max-w-3xl px-4 pb-20 pt-4 text-center sm:px-6">
-            <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl md:text-4xl">
+            <h2 className="text-2xl font-semibold tracking-tight text-ink sm:text-3xl md:text-4xl">
               Get your resume reviewed in seconds
             </h2>
             <div className="mt-6 flex justify-center">

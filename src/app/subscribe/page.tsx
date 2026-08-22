@@ -171,7 +171,7 @@ const SubscriptionPage = () => {
                   insights
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-orange-400">✓</span> Gemini polish
+                  <span className="text-orange-400">✓</span> Gemini/Groq polish
                 </li>
               </ul>
 

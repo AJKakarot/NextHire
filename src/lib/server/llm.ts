@@ -1,22 +1,27 @@
 function llmConfig() {
   const groqKey = process.env.GROQ_API_KEY?.trim();
   if (groqKey) {
+    const model =
+      process.env.GROQ_MODEL ||
+      process.env.LLM_MODEL ||
+      "openai/gpt-oss-20b";
     return {
+      provider: "groq" as const,
       url: "https://api.groq.com/openai/v1/chat/completions",
       key: groqKey,
-      model:
-        process.env.GROQ_MODEL ||
-        process.env.LLM_MODEL ||
-        "llama-3.3-70b-versatile",
+      model,
+      isGptOss: model.includes("gpt-oss"),
     };
   }
 
   const openAiKey = process.env.OPENAI_API_KEY?.trim();
   if (openAiKey) {
     return {
+      provider: "openai" as const,
       url: "https://api.openai.com/v1/chat/completions",
       key: openAiKey,
       model: process.env.OPENAI_MODEL || process.env.LLM_MODEL || "gpt-4o-mini",
+      isGptOss: false,
     };
   }
 
@@ -25,8 +30,67 @@ function llmConfig() {
   );
 }
 
-export async function generateJsonPrompt(prompt: string) {
-  const { url, key, model } = llmConfig();
+type LlmPayload = {
+  error?: {
+    message?: string;
+    failed_generation?: string;
+  };
+  choices?: Array<{
+    message?: {
+      content?: string | null;
+      reasoning?: string | null;
+    };
+    finish_reason?: string;
+  }>;
+};
+
+function extractText(payload: LlmPayload) {
+  const message = payload.choices?.[0]?.message;
+  return (
+    message?.content?.trim() ||
+    payload.error?.failed_generation?.trim() ||
+    ""
+  );
+}
+
+async function requestLlm(prompt: string, polish: boolean, useJsonFormat: boolean) {
+  const { url, key, model, provider, isGptOss } = llmConfig();
+  const jsonMode = useJsonFormat && !isGptOss;
+
+  const body: Record<string, unknown> = {
+    model,
+    temperature: polish ? 0.35 : 0.2,
+    max_completion_tokens: 4096,
+    messages: isGptOss
+      ? [
+          {
+            role: "user",
+            content: `${
+              polish
+                ? "You are a senior career coach and resume editor. Be specific and recruiter-ready."
+                : "You are a career and resume assistant."
+            }\nReply with a single valid JSON object only. No markdown. No extra text.\n\n${prompt}`,
+          },
+        ]
+      : [
+          {
+            role: "system",
+            content: polish
+              ? "You are a senior career coach and resume editor. Be specific and recruiter-ready. Reply with a single valid JSON object only."
+              : "You are a career and resume assistant. Reply with a single valid JSON object only.",
+          },
+          { role: "user", content: prompt },
+        ],
+  };
+
+  if (jsonMode) {
+    body.response_format = { type: "json_object" };
+  }
+
+  if (provider === "groq" && isGptOss) {
+    body.include_reasoning = false;
+    body.reasoning_effort = "low";
+  }
 
   const res = await fetch(url, {
     method: "POST",
@@ -34,31 +98,49 @@ export async function generateJsonPrompt(prompt: string) {
       Authorization: `Bearer ${key}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      model,
-      temperature: 0.4,
-      response_format: { type: "json_object" },
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a career and resume assistant. Reply with valid JSON only. Do not wrap the JSON in markdown.",
-        },
-        { role: "user", content: prompt },
-      ],
-    }),
+    body: JSON.stringify(body),
   });
 
-  const payload = (await res.json()) as {
-    error?: { message?: string };
-    choices?: Array<{ message?: { content?: string } }>;
-  };
+  const payload = (await res.json()) as LlmPayload;
+  const text = extractText(payload);
 
-  if (!res.ok) {
+  if (!res.ok && !text) {
     throw new Error(payload.error?.message || `LLM request failed (${res.status})`);
   }
 
-  const text = payload.choices?.[0]?.message?.content?.trim();
+  return text;
+}
+
+function canParseJson(text: string) {
+  try {
+    parseLlmJson(text);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function generateJsonPrompt(
+  prompt: string,
+  options?: { polish?: boolean }
+) {
+  const polish = Boolean(options?.polish);
+  const { isGptOss } = llmConfig();
+
+  let text = "";
+  try {
+    text = await requestLlm(prompt, polish, !isGptOss);
+  } catch {
+    text = "";
+  }
+
+  if (!text || !canParseJson(text)) {
+    const fallback = await requestLlm(prompt, polish, false);
+    if (fallback) {
+      text = fallback;
+    }
+  }
+
   if (!text) {
     throw new Error("Ai did not return a valid text response.");
   }
@@ -66,14 +148,37 @@ export async function generateJsonPrompt(prompt: string) {
   return { text };
 }
 
+function repairJson(raw: string) {
+  return raw
+    .replace(/```json/gi, "")
+    .replace(/```/g, "")
+    .replace(/,\s*([}\]])/g, "$1")
+    .trim();
+}
+
 export function parseLlmJson(raw?: string | null) {
-  const rawText = raw?.replace(/```json/g, "").replace(/```/g, "").trim();
+  const rawText = repairJson(raw || "");
 
   if (!rawText) {
     throw new Error("Ai did not return a valid text response.");
   }
 
-  return JSON.parse(rawText);
+  const candidates = [rawText];
+  const start = rawText.indexOf("{");
+  const end = rawText.lastIndexOf("}");
+  if (start >= 0 && end > start) {
+    candidates.push(rawText.slice(start, end + 1));
+  }
+
+  for (const candidate of candidates) {
+    try {
+      return JSON.parse(repairJson(candidate));
+    } catch {
+      // try next
+    }
+  }
+
+  throw new Error("Ai returned response that was not valid JSON");
 }
 
 export async function extractPdfText(pdfBase64: string) {
@@ -90,5 +195,5 @@ export async function extractPdfText(pdfBase64: string) {
     throw new Error("Could not read text from this PDF. Try another file.");
   }
 
-  return text.slice(0, 20000);
+  return text.slice(0, 12000);
 }

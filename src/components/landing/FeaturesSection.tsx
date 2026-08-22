@@ -17,7 +17,7 @@ export function FeaturesSection() {
   return (
     <section
       id="features"
-      className="relative overflow-hidden border-t border-white/[0.04] bg-black py-12 sm:py-16 md:py-20"
+      className="relative overflow-hidden border-t border-line bg-canvas py-12 sm:py-16 md:py-20"
       aria-labelledby="features-heading"
     >
       <div
@@ -33,13 +33,13 @@ export function FeaturesSection() {
         <div className="mx-auto max-w-2xl text-center">
           <h2
             id="features-heading"
-            className="text-lg font-medium uppercase tracking-[0.08em] text-white sm:text-xl md:text-2xl"
+            className="text-lg font-medium uppercase tracking-[0.08em] text-ink sm:text-xl md:text-2xl"
           >
             Smarter hiring
           </h2>
-          <p className="mt-3 text-sm text-zinc-400 sm:mt-4 sm:text-base">
+          <p className="mt-3 text-sm text-mute sm:mt-4 sm:text-base">
             ATS scan, job applications, career guide—optional{" "}
-            <span className="text-orange-400/95">Gemini</span> polish on Pro.
+            <span className="text-info">Gemini/Groq</span> polish.
           </p>
         </div>
 
@@ -56,13 +56,13 @@ export function FeaturesSection() {
           ))}
         </div>
 
-        <p className="mx-auto mt-12 max-w-lg text-center text-xs leading-relaxed text-zinc-500 sm:mt-14">
+        <p className="mx-auto mt-12 max-w-lg text-center text-xs leading-relaxed text-mute sm:mt-14">
           Free includes jobs, resume analysis, and career guide. Pro adds
           visibility and{" "}
-          <span className="text-orange-400/85">Gemini</span> polish.{" "}
+          <span className="text-info">Gemini/Groq</span> polish.{" "}
           <Link
             href="/subscribe"
-            className="font-medium text-orange-400 underline-offset-2 transition-colors hover:text-orange-300 hover:underline"
+            className="font-medium text-info underline-offset-2 transition-colors hover:text-brand-hover hover:underline"
           >
             Compare plans
           </Link>
