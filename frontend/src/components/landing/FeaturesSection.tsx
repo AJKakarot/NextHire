@@ -13,7 +13,11 @@ function layoutToVariant(
   return "default";
 }
 
-export function FeaturesSection() {
+export function FeaturesSection({ showPricing = true }: { showPricing?: boolean }) {
+  const features = showPricing
+    ? LANDING_FEATURES
+    : LANDING_FEATURES.filter((f) => f.layout !== "pro");
+
   return (
     <section
       id="features"
@@ -38,13 +42,21 @@ export function FeaturesSection() {
             Smarter hiring
           </h2>
           <p className="mt-3 text-sm text-zinc-400 sm:mt-4 sm:text-base">
-            ATS scan, job applications, career guide—optional{" "}
-            <span className="text-orange-400/95">Gemini</span> polish on Pro.
+            {showPricing ? (
+              <>
+                ATS scan, job applications, career guide—optional{" "}
+                <span className="text-orange-400/95">Gemini</span> polish on Pro.
+              </>
+            ) : (
+              <>
+                ATS scan, job applications, and an AI career guide in one place.
+              </>
+            )}
           </p>
         </div>
 
         <div className="mx-auto mt-10 grid max-w-6xl grid-cols-1 items-stretch gap-5 sm:mt-12 sm:gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-7">
-          {LANDING_FEATURES.map((f) => (
+          {features.map((f) => (
             <FeatureCard
               key={f.title}
               tag={f.tag}
@@ -56,18 +68,20 @@ export function FeaturesSection() {
           ))}
         </div>
 
-        <p className="mx-auto mt-12 max-w-lg text-center text-xs leading-relaxed text-zinc-500 sm:mt-14">
-          Free includes jobs, resume analysis, and career guide. Pro adds
-          visibility and{" "}
-          <span className="text-orange-400/85">Gemini</span> polish.{" "}
-          <Link
-            href="/subscribe"
-            className="font-medium text-orange-400 underline-offset-2 transition-colors hover:text-orange-300 hover:underline"
-          >
-            Compare plans
-          </Link>
-          .
-        </p>
+        {showPricing && (
+          <p className="mx-auto mt-12 max-w-lg text-center text-xs leading-relaxed text-zinc-500 sm:mt-14">
+            Free includes jobs, resume analysis, and career guide. Pro adds
+            visibility and{" "}
+            <span className="text-orange-400/85">Gemini</span> polish.{" "}
+            <Link
+              href="/subscribe"
+              className="font-medium text-orange-400 underline-offset-2 transition-colors hover:text-orange-300 hover:underline"
+            >
+              Compare plans
+            </Link>
+            .
+          </p>
+        )}
       </div>
     </section>
   );
