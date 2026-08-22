@@ -160,17 +160,24 @@ export const forgotPassword = TryCatch(async (req, res, next) => {
     { expiresIn: "15m" }
   );
 
-  const resetLink = `${process.env.Frontend_Url}/reset/${resetToken}`;
+  const frontendUrl = (process.env.Frontend_Url || "").replace(/\/$/, "");
+  const resetLink = `${frontendUrl}/reset/${resetToken}`;
 
   await redisClient.set(`forgot:${email}`, resetToken, { ex: 900 });
 
-  sendMail({
-    to: email,
-    subject: "RESET Your Password - nextHire",
-    html: forgotPasswordTemplate(resetLink),
-  }).catch((error) => {
+  try {
+    await sendMail({
+      to: email,
+      subject: "RESET Your Password - nextHire",
+      html: forgotPasswordTemplate(resetLink),
+    });
+  } catch (error: any) {
     console.error("failed to send mail", error);
-  });
+    throw new ErrorHandler(
+      500,
+      "Could not send reset email. Check SMTP settings on Auth."
+    );
+  }
 
   res.json({
     message: "If that email exists, we have sent a reset link",
