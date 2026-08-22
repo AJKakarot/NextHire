@@ -7,7 +7,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { forgotPasswordTemplate } from "../templete.js";
 import { sendMail } from "../utils/sendMail.js";
-import { redisClient } from "../index.js";
+import { redisClient } from "../utils/redis.js";
 
 export const registerUser = TryCatch(async (req, res, next) => {
   const { name, email, password, phoneNumber, role, bio } = req.body;
@@ -144,9 +144,7 @@ export const forgotPassword = TryCatch(async (req, res, next) => {
 
   const resetLink = `${process.env.Frontend_Url}/reset/${resetToken}`;
 
-  await redisClient.set(`forgot:${email}`, resetToken, {
-    EX: 900,
-  });
+  await redisClient.set(`forgot:${email}`, resetToken, { ex: 900 });
 
   sendMail({
     to: email,
