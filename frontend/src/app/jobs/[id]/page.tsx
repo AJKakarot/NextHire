@@ -19,6 +19,8 @@ import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import PageBackground from "@/components/page-background";
+import { glassCardSm } from "@/lib/brand";
 
 const JobPage = () => {
   const { id } = useParams();
@@ -115,13 +117,14 @@ const JobPage = () => {
     }
   };
   return (
-    <div className="min-h-screen bg-secondary/30">
+    <div className="relative min-h-screen">
+      <PageBackground />
       {loading ? (
         <Loading />
       ) : (
         <>
           {job && (
-            <div className="max-w-5xl mx-auto px-4 py-8">
+            <div className="relative mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
               <Button
                 variant={"ghost"}
                 className="mb-6 gap-2"
@@ -130,28 +133,28 @@ const JobPage = () => {
                 <ArrowRight size={18} /> Back to jobs
               </Button>
 
-              <Card className="overflow-hidden shadow-lg border-2 mb-6">
-                <div className="bg-blue-600 p-8 border-b">
+              <Card className="mb-6 overflow-hidden border-white/[0.08] bg-white/[0.04] shadow-lg shadow-black/20">
+                <div className="border-b border-white/10 bg-gradient-to-r from-orange-500/90 to-orange-600/90 p-8">
                   <div className="flex items-start justify-between gap-4 flex-wrap">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-3">
                         <span
-                          className={`px-3 py-1.5 rounded-full text-sm font-medium ${
+                          className={`rounded-full px-3 py-1.5 text-sm font-medium ${
                             job.is_active
-                              ? "bg-green-100 dark:bg-green-900/30 text-green-600"
-                              : "bg-red-100 dark:bg-red-900/30 text-red-600"
+                              ? "border border-emerald-500/30 bg-emerald-500/15 text-emerald-300"
+                              : "border border-rose-500/30 bg-rose-500/15 text-rose-300"
                           }`}
                         >
                           {job.is_active ? "Open" : "Closed"}
                         </span>
                       </div>
 
-                      <h1 className="text-3xl md:text-4xl font-bold mb-4 text-white">
+                      <h1 className="mb-4 text-3xl font-bold text-white md:text-4xl">
                         {job.title}
                       </h1>
-                      <div className="flex items-center gap-2 text-base opacity-70 mb-2 text-white">
+                      <div className="mb-2 flex items-center gap-2 text-base text-white/80">
                         <Building2 size={18} />
-                        <span>Company Name</span>
+                        <span>{job.company_name}</span>
                       </div>
                     </div>
 
@@ -159,7 +162,7 @@ const JobPage = () => {
                       <div className="shrink-0">
                         {applied ? (
                           <>
-                            <div className="flex items-center gap-2 px-6 py-3 rounded-lg bg-green-100 dark:bg-gray-900/30 text-green-600 font-medium">
+                            <div className="flex items-center gap-2 rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-6 py-3 font-medium text-emerald-300">
                               <CheckCircle2 size={20} />
                               Already Applied
                             </div>
@@ -186,9 +189,9 @@ const JobPage = () => {
                 {/* details */}
                 <div className="p-8">
                   <div className="grid md:grid-cols-3 gap-6 mb-8">
-                    <div className="flex items-center gap-3 p-4 rounded-lg border bg-background">
-                      <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
-                        <MapPin size={20} className="text-blue-600" />
+                    <div className={`${glassCardSm} flex items-center gap-3 p-4`}>
+                      <div className="h-12 w-12 rounded-full bg-orange-500/10 flex items-center justify-center shrink-0">
+                        <MapPin size={20} className="text-orange-400" />
                       </div>
                       <div>
                         <p className="text-xs opacity-70 font-medium mb-1">
@@ -198,9 +201,9 @@ const JobPage = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3 p-4 rounded-lg border bg-background">
-                      <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
-                        <DollarSign size={20} className="text-blue-600" />
+                    <div className={`${glassCardSm} flex items-center gap-3 p-4`}>
+                      <div className="h-12 w-12 rounded-full bg-orange-500/10 flex items-center justify-center shrink-0">
+                        <DollarSign size={20} className="text-orange-400" />
                       </div>
                       <div>
                         <p className="text-xs opacity-70 font-medium mb-1">
@@ -210,9 +213,9 @@ const JobPage = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3 p-4 rounded-lg border bg-background">
-                      <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
-                        <Users size={20} className="text-blue-600" />
+                    <div className={`${glassCardSm} flex items-center gap-3 p-4`}>
+                      <div className="h-12 w-12 rounded-full bg-orange-500/10 flex items-center justify-center shrink-0">
+                        <Users size={20} className="text-orange-400" />
                       </div>
                       <div>
                         <p className="text-xs opacity-70 font-medium mb-1">
@@ -226,12 +229,12 @@ const JobPage = () => {
                   {/* job descripiton */}
                   <div className="space-y-4">
                     <h2 className="text-2xl font-bold flex items-center gap-2">
-                      <Briefcase size={24} className="text-blue-600" />
+                      <Briefcase size={24} className="text-orange-400" />
                       Job Description
                     </h2>
 
-                    <div className="p-6 rounded-lg bg-secondary border">
-                      <p className="text-base leading-relaxed whitespace-pre-line">
+                    <div className={`${glassCardSm} p-6`}>
+                      <p className="whitespace-pre-line text-base leading-relaxed text-zinc-300">
                         {job.description}
                       </p>
                     </div>
@@ -244,9 +247,9 @@ const JobPage = () => {
       )}
 
       {user && job && user.user_id === job.posted_by_recuriter_id && (
-        <div className="w-[90%] md:w-2/3 container mx-auto mt-8 mb-8">
-          <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
-            <h2 className="text-2xl font-bold">All Applications</h2>
+        <div className="relative mx-auto mb-8 mt-8 w-[90%] max-w-3xl md:w-2/3">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-2xl font-bold text-white">All Applications</h2>
             <div className="flex items-center gap-2">
               <label htmlFor="filter-status" className="text-sm font-medium">
                 Filter:
@@ -255,7 +258,7 @@ const JobPage = () => {
                 id="filter-status"
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="p-2 border-2 border-gray-300 rounded-md bg-background"
+                className="h-11 rounded-xl border border-white/15 bg-black/30 px-3 text-zinc-100 outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20"
               >
                 <option value="All">All Status</option>
                 <option value="Submitted">Submitted</option>
@@ -270,17 +273,17 @@ const JobPage = () => {
               <div className="space-y-4">
                 {filteredApplications.map((e) => (
                   <div
-                    className="p-4 rounded-lg border-2 bg-background"
+                    className={`${glassCardSm} p-4`}
                     key={e.application_id}
                   >
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="mb-3 flex items-center justify-between">
                       <span
-                        className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        className={`rounded-full px-3 py-1 text-sm font-medium ${
                           e.status === "Hired"
-                            ? "bg-green-100 dark:bg-green-900/30 text-green-600"
+                            ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
                             : e.status === "Rejected"
-                            ? "bg-red-100 dark:bg-red-900/30 text-red-600"
-                            : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600"
+                            ? "border border-rose-500/30 bg-rose-500/10 text-rose-300"
+                            : "border border-amber-500/30 bg-amber-500/10 text-amber-300"
                         }`}
                       >
                         {e.status}
@@ -291,7 +294,7 @@ const JobPage = () => {
                       <Link
                         target="_blank"
                         href={e.resume}
-                        className="text-blue-500 hover:underline text-sm"
+                        className="text-orange-400 hover:text-orange-300 text-sm"
                       >
                         View Resume
                       </Link>
@@ -299,7 +302,7 @@ const JobPage = () => {
                       <Link
                         target="_blank"
                         href={`/account/${e.applicant_id}`}
-                        className="text-blue-500 hover:underline text-sm"
+                        className="text-orange-400 hover:text-orange-300 text-sm"
                       >
                         View Profile
                       </Link>

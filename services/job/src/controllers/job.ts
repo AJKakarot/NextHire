@@ -5,7 +5,7 @@ import { sql } from "../utils/db.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import { TryCatch } from "../utils/TryCatch.js";
 import { applicationStatusUpdateTemplate } from "../tempelete.js";
-import { publishToTopic } from "../producer.js";
+import { sendMail } from "../utils/sendMail.js";
 
 export const createCompany = TryCatch(
   async (req: AuthenticatedRequest, res) => {
@@ -330,14 +330,12 @@ export const updateApplication = TryCatch(
     const [updatedApplication] =
       await sql`UPDATE applications SET status = ${req.body.status} WHERE application_id = ${id} RETURNING *`;
 
-    const message = {
+    sendMail({
       to: application.applicant_email,
       subject: "Application Update - Job portal",
       html: applicationStatusUpdateTemplate(job.title),
-    };
-
-    publishToTopic("send-mail", message).catch((error) => {
-      console.error("Failed to publish message to kafka", error);
+    }).catch((error) => {
+      console.error("Failed to send mail", error);
     });
 
     res.json({

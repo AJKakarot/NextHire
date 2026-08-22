@@ -1,26 +1,35 @@
 "use client";
-import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import React from "react";
+import PageBackground from "@/components/page-background";
+import { glassCard } from "@/lib/brand";
 
 const PaymentVerification = () => {
   const { id } = useParams();
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-secondary/30">
-      <Card className="max-w-md w-full p-8 text-center shadow-lg border-2">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 mb-4">
-          <CheckCircle size={40} className="text-green-600" />
+    <div className="relative flex min-h-screen items-center justify-center px-4 py-12">
+      <PageBackground />
+      <div className={`${glassCard} w-full max-w-md p-8 text-center`}>
+        <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500/10">
+          <CheckCircle size={40} className="text-emerald-400" />
         </div>
-        <h1 className="text-3xl font-bold mb-2">Payment Successful!</h1>
-        <p className="text-base opacity-70 mb-8">
-          Your Subscription is now active. Your transaction id is {id}
+        <h1 className="text-3xl font-semibold text-white">You&apos;re on Pro!</h1>
+        <p className="mt-2 text-zinc-400">
+          Payment successful. Transaction ID: {id}
         </p>
-
-        <Link href={"/account"}>Go to account page</Link>
-      </Card>
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+          <Link href="/account">
+            <Button variant="outline">Go to Account</Button>
+          </Link>
+          <Link href="/jobs">
+            <Button>Browse Jobs</Button>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 };

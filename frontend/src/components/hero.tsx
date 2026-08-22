@@ -1,108 +1,104 @@
-import { ArrowRight, Briefcase, Search, TrendingUp } from "lucide-react";
+"use client";
+
 import Link from "next/link";
 import React from "react";
 import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+
+const pillPrimary =
+  "h-11 rounded-full border-0 bg-orange-500 px-7 text-sm font-medium text-black shadow-none transition-all hover:bg-orange-400 hover:scale-[1.02]";
+
+const pillOutline =
+  "h-11 rounded-full border border-white/20 bg-transparent px-7 text-sm font-medium text-white shadow-none transition-all hover:border-white/35 hover:bg-white/[0.04] hover:scale-[1.02]";
 
 const Hero = () => {
   return (
-    <section className="relative overflow-hidden bg-secondary">
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-500 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96  rounded-full blur-3xl"></div>
+    <section className="mx-auto max-w-3xl px-4 pb-4 pt-10 sm:px-6 sm:pt-14">
+      <div className="relative text-center">
+        <h1 className="text-[clamp(1.75rem,5vw,3rem)] font-semibold leading-tight tracking-tight text-white">
+          Analyze your{" "}
+          <span className="bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text text-transparent">
+            resume
+          </span>{" "}
+          with{" "}
+          <span className="relative inline-block">
+            <span
+              className="animate-glow-ai-halo pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[2em] w-[2.25em] -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-500/25 blur-xl motion-reduce:animate-none"
+              aria-hidden
+            />
+            <span className="animate-glow-ai-text relative inline-block bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text font-semibold text-transparent motion-reduce:animate-none">
+              AI
+            </span>
+          </span>
+        </h1>
+
+        <p className="mx-auto mt-3 max-w-md text-sm text-zinc-400 sm:text-base">
+          Get ATS score and improve instantly
+        </p>
+
+        <div className="mx-auto mt-6 flex flex-col items-stretch justify-center gap-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+          <Link href="/jobs" className="sm:w-auto">
+            <Button className={`w-full sm:w-auto ${pillPrimary}`}>
+              Browse Jobs
+            </Button>
+          </Link>
+          <Link href="/career-guide" className="sm:w-auto">
+            <Button variant="outline" className={`w-full sm:w-auto ${pillOutline}`}>
+              Career guide
+            </Button>
+          </Link>
+          <a href="#resume-analyzer" className="sm:w-auto">
+            <Button variant="outline" className={`w-full sm:w-auto ${pillOutline}`}>
+              Upload Resume
+            </Button>
+          </a>
+        </div>
       </div>
 
-      <div className="container mx-auto px-5 py-16 md:py-24 relative">
-        <div className="flex flex-col-reverse md:flex-row items-center gap-12 md:gap-16">
-          <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left space-y-6">
-            {/* badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border bg-background/50 backdrop-blur-sm">
-              <TrendingUp size={16} className="text-blue-600" />
-              <span className="text-sm font-medium">
-                #1 Job Platform in India
-              </span>
-            </div>
-
-            {/* main heading */}
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-              Find Your Dream Job at{" "}
-              <span className="inline-block">
-                Hire<span className="text-red-500">Heaven</span>
-              </span>
-            </h1>
-
-            {/* descripiton */}
-            <p className="text-lg md:text-xl leading-relaxed opacity-80 max-w-2xl">
-              Connect with top employers and discover opportunities that match
-              your skills. Wheather you're a job seeker or recruiter, we've got
-              you covered with powerful tools and seamless experience.
-            </p>
-
-            {/* stats */}
-            <div className="flex flex-wrap justify-center md:justify-start gap-8 py-4">
-              <div className="text-center md:text-left">
-                <p className="text-3xl font-bold text-blue-600">10k+</p>
-                <p className="text-sm opacity-70">Active Jobs</p>
-              </div>
-              <div className="text-center md:text-left">
-                <p className="text-3xl font-bold text-blue-600">5k+</p>
-                <p className="text-sm opacity-70">Companies</p>
-              </div>
-              <div className="text-center md:text-left">
-                <p className="text-3xl font-bold text-blue-600">50k+</p>
-                <p className="text-sm opacity-70">Job Seekers</p>
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-4 pt-2">
-              <Link href={"/jobs"}>
-                <Button
-                  size={"lg"}
-                  className="text-base px-8 h-12 gap-2 group transition-all"
-                >
-                  <Search size={18} />
-                  Browse Jobs{" "}
-                  <ArrowRight
-                    size={18}
-                    className="group-hover:translate-x-1 transition-transform"
-                  />
-                </Button>
-              </Link>
-              <Link href={"/about"}>
-                <Button
-                  variant={"outline"}
-                  size={"lg"}
-                  className="text-base px-8 h-12 gap-2"
-                >
-                  <Briefcase size={18} />
-                  Learn More
-                </Button>
-              </Link>
-            </div>
-
-            {/* trust indicator section */}
-            <div className="flex items-center gap-2 text-sm opacity-60 pt-4">
-              <span>✔️ Free to use</span>
-              <span>•</span>
-              <span>✔️ Verified emplyers</span>
-              <span>•</span>
-              <span>✔️ Secure platform</span>
-            </div>
+      <div className="mx-auto mt-8 max-w-2xl rounded-2xl border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+        <div className="space-y-4">
+          <div className="space-y-2 text-left">
+            <Label htmlFor="target-job" className="text-sm text-zinc-400">
+              Target job title
+            </Label>
+            <Input
+              id="target-job"
+              placeholder="e.g. Senior Full-Stack Engineer"
+              className="h-11 rounded-xl border-white/10 bg-black/40 text-zinc-100 placeholder:text-zinc-600"
+            />
           </div>
 
-          {/* image section */}
-          <div className="flex-1 relative">
-            <div className="relative group">
-              <div className="absolute -inset-4 bg-blue-400 opacity-20 blur-xl group-hover:opacity-30 transition-opacity"></div>
-
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-background">
-                <img
-                  src="/hero.jpeg"
-                  className="object-cover object-center w-full h-full transform transition-transform duration-500 group-hover:scale-105"
-                  alt=""
-                />
-              </div>
-            </div>
+          <div className="space-y-2 text-left">
+            <Label htmlFor="job-description" className="text-sm text-zinc-400">
+              Job description
+            </Label>
+            <textarea
+              id="job-description"
+              rows={4}
+              placeholder="Paste JD → Get match & insights."
+              className="w-full resize-none rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 outline-none focus-visible:border-orange-500/40 focus-visible:ring-1 focus-visible:ring-orange-500/20"
+            />
           </div>
+
+          <label className="flex cursor-pointer items-center gap-2.5 text-left text-sm text-zinc-400">
+            <input
+              type="checkbox"
+              className="h-4 w-4 rounded border-white/20 bg-black/40 accent-orange-500"
+            />
+            <span>
+              Add{" "}
+              <span className="bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text font-medium text-transparent">
+                Gemini
+              </span>{" "}
+              polish.
+            </span>
+          </label>
+
+          <p className="text-left text-xs text-zinc-600">
+            Use <span className="text-zinc-500">Continue with Google</span> in the
+            header to enable Gemini polish.
+          </p>
         </div>
       </div>
     </section>

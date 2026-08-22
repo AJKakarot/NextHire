@@ -7,6 +7,7 @@ import Skills from "./components/skills";
 import Company from "./components/company";
 import { useRouter } from "next/navigation";
 import AppliedJobs from "./components/appliedJobs";
+import PageBackground from "@/components/page-background";
 
 const AccountPage = () => {
   const { isAuth, user, loading, applications } = useAppData();
@@ -21,9 +22,10 @@ const AccountPage = () => {
 
   if (loading) return <Loading />;
   return (
-    <>
+    <div className="relative min-h-screen">
+      <PageBackground />
       {user && (
-        <div className="w-[90%] md:w-[60%] m-auto">
+        <div className="relative mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">
           <Info user={user} isYourAccount={true} />
           {user.role === "jobseeker" && (
             <Skills user={user} isYourAccount={true} />
@@ -34,7 +36,7 @@ const AccountPage = () => {
           {user.role === "recruiter" && <Company />}
         </div>
       )}
-    </>
+    </div>
   );
 };
 

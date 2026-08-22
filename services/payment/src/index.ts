@@ -6,9 +6,14 @@ import paymentRoutes from "./routes/payment.js";
 
 dotenv.config();
 
+const razorpayKeyId =
+  process.env.Razorpay_Key || process.env.razorpay_key_id;
+const razorpayKeySecret =
+  process.env.Razorpay_Secret || process.env.razorpay_key_secret;
+
 export const instance = new Razorpay({
-  key_id: process.env.Razorpay_Key,
-  key_secret: process.env.Razorpay_Secret,
+  key_id: razorpayKeyId,
+  key_secret: razorpayKeySecret,
 });
 
 const app = express();

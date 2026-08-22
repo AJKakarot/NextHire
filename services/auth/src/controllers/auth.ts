@@ -6,7 +6,7 @@ import { TryCatch } from "../utils/TryCatch.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { forgotPasswordTemplate } from "../templete.js";
-import { publishToTopic } from "../producer.js";
+import { sendMail } from "../utils/sendMail.js";
 import { redisClient } from "../index.js";
 
 export const registerUser = TryCatch(async (req, res, next) => {
@@ -148,14 +148,12 @@ export const forgotPassword = TryCatch(async (req, res, next) => {
     EX: 900,
   });
 
-  const message = {
+  sendMail({
     to: email,
-    subject: "RESET Your Password - hireheaven",
+    subject: "RESET Your Password - nextHire",
     html: forgotPasswordTemplate(resetLink),
-  };
-
-  publishToTopic("send-mail", message).catch((error) => {
-    console.error("failed to send message", error);
+  }).catch((error) => {
+    console.error("failed to send mail", error);
   });
 
   res.json({
@@ -166,11 +164,12 @@ export const forgotPassword = TryCatch(async (req, res, next) => {
 export const resetPassword = TryCatch(async (req, res, next) => {
   const { token } = req.params;
   const { password } = req.body;
+  const resetToken = Array.isArray(token) ? token[0] : token;
 
   let decoded: any;
 
   try {
-    decoded = jwt.verify(token, process.env.JWT_SEC as string);
+    decoded = jwt.verify(resetToken, process.env.JWT_SEC as string);
   } catch (error) {
     throw new ErrorHandler(400, "Expired token");
   }

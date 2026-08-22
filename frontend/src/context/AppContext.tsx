@@ -6,11 +6,16 @@ import toast, { Toaster } from "react-hot-toast";
 import Cookies from "js-cookie";
 import axios from "axios";
 
-export const utils_service = "http://35.154.186.96:5001";
-export const auth_service = "http://35.154.186.96:5000";
-export const user_service = "http://35.154.186.96:5002";
-export const job_service = "http://35.154.186.96:5003";
-export const payment_service = "http://35.154.186.96:5004";
+export const utils_service =
+  process.env.NEXT_PUBLIC_UTILS_SERVICE || "http://localhost:5001";
+export const auth_service =
+  process.env.NEXT_PUBLIC_AUTH_SERVICE || "http://localhost:5010";
+export const user_service =
+  process.env.NEXT_PUBLIC_USER_SERVICE || "http://localhost:5002";
+export const job_service =
+  process.env.NEXT_PUBLIC_JOB_SERVICE || "http://localhost:5003";
+export const payment_service =
+  process.env.NEXT_PUBLIC_PAYMENT_SERVICE || "http://localhost:5004";
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
@@ -20,13 +25,23 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [btnLoading, setBtnLoading] = useState(false);
 
-  const token = Cookies.get("token");
+  const getToken = () => Cookies.get("token");
 
   async function fetchUser() {
+    const authToken = Cookies.get("token");
+
+    if (!authToken || authToken === "undefined") {
+      Cookies.remove("token");
+      setIsAuth(false);
+      setUser(null);
+      setLoading(false);
+      return;
+    }
+
     try {
       const { data } = await axios.get(`${user_service}/api/user/me`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${authToken}`,
         },
       });
 
@@ -34,13 +49,16 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       setIsAuth(true);
     } catch (error) {
       console.log(error);
+      Cookies.remove("token");
       setIsAuth(false);
+      setUser(null);
     } finally {
       setLoading(false);
     }
   }
 
   async function updateProfilePic(fromData: any) {
+    const authToken = Cookies.get("token");
     setLoading(true);
     try {
       const { data } = await axios.put(
@@ -48,7 +66,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         fromData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${authToken}`,
           },
         }
       );
@@ -63,6 +81,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   }
 
   async function updateResume(fromData: any) {
+    const authToken = Cookies.get("token");
     setLoading(true);
     try {
       const { data } = await axios.put(
@@ -70,7 +89,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         fromData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${getToken()}`,
           },
         }
       );
@@ -92,7 +111,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         { name, phoneNumber, bio },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${getToken()}`,
           },
         }
       );
@@ -106,7 +125,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   }
 
   async function logoutUser() {
-    Cookies.set("token", "");
+    Cookies.remove("token");
     setUser(null);
     setIsAuth(false);
     toast.success("Logged out successfully");
@@ -123,7 +142,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         { skillName: skill },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${getToken()}`,
           },
         }
       );
@@ -144,7 +163,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         { skillName: skill },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${getToken()}`,
           },
         }
       );
@@ -163,7 +182,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         { job_id },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${getToken()}`,
           },
         }
       );
@@ -180,12 +199,15 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [applications, setApplications] = useState<Application[]>([]);
 
   async function fetchApplications() {
+    const authToken = getToken();
+    if (!authToken || authToken === "undefined") return;
+
     try {
       const { data } = await axios.get(
         `${user_service}/api/user/application/all`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${authToken}`,
           },
         }
       );
@@ -198,7 +220,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
   useEffect(() => {
     fetchUser();
-    fetchApplications();
+    const authToken = Cookies.get("token");
+    if (authToken && authToken !== "undefined") {
+      fetchApplications();
+    }
   }, []);
 
   return (

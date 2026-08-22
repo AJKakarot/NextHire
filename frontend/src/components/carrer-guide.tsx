@@ -1,317 +1,237 @@
 "use client";
+
 import { CareerGuideResponse } from "@/type";
+import { utils_service } from "@/context/AppContext";
 import axios from "axios";
 import {
-  ArrowRight,
   BookOpen,
   Briefcase,
   Lightbulb,
   Loader2,
-  Sparkles,
-  Target,
   TrendingUp,
-  X,
 } from "lucide-react";
-import React, { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog";
+import Link from "next/link";
+import React, { useMemo, useState } from "react";
 import { Button } from "./ui/button";
-import { Label } from "./ui/label";
 import { Input } from "./ui/input";
-import { utils_service } from "@/context/AppContext";
+import SiteLogo from "./site-logo";
 import toast from "react-hot-toast";
+import { glassCardSm } from "@/lib/brand";
+import { ApiLoadingMessages } from "@/components/api-loading-messages";
+import { useApiLoadingToast } from "@/hooks/use-api-loading-toast";
+
+const parseSkills = (raw: string) =>
+  raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
 
 const CarrerGuide = () => {
-  const [open, setOpen] = useState(false);
-  const [skills, setSkills] = useState<string[]>([]);
-  const [currentSkill, setCurrentSkill] = useState("");
+  const [skillsInput, setSkillsInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<CareerGuideResponse | null>(null);
 
-  const addSkill = () => {
-    if (currentSkill.trim() && !skills.includes(currentSkill.trim())) {
-      setSkills([...skills, currentSkill.trim()]);
-      setCurrentSkill("");
-    }
-  };
-
-  const removeSkill = (skillToRemove: string) => {
-    setSkills(skills.filter((s) => s !== skillToRemove));
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      addSkill();
-    }
-  };
+  const skills = useMemo(() => parseSkills(skillsInput), [skillsInput]);
+  const canGenerate = skills.length > 0 && !loading;
+  const apiToast = useApiLoadingToast({
+    toastId: "api-loading-career",
+    mode: "replace",
+  });
 
   const getCarrerGuidance = async () => {
     if (skills.length === 0) {
-      toast.error("Please add at least on skill");
+      toast.error("Please add at least one skill");
       return;
     }
+
     setLoading(true);
+    apiToast.start();
     try {
       const { data } = await axios.post(`${utils_service}/api/utils/career`, {
-        skills: skills,
+        skills,
       });
-
       setResponse(data);
-      toast.success("Carrer guidence generated");
+      apiToast.success("Career guidance generated");
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      apiToast.error(
+        error.response?.data?.message || "Failed to generate guide"
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  const resetDialog = () => {
-    setSkills([]);
-    setCurrentSkill("");
-    setResponse(null);
-    setOpen(false);
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && canGenerate) {
+      e.preventDefault();
+      getCarrerGuidance();
+    }
   };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 py-16">
-      <div className="text-center mb-12">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border bg-blue-50 dark:bg-blue-950 mb-4">
-          <Sparkles size={16} className="text-blue-600" />
-          <span className="text-sm font-medium">
-            AI-Powered Carrer Guidence
-          </span>
-        </div>
-        <h2 className="text-3xl md:text-4xl font-bold mb-4">
-          Discover Your Carrer Path
-        </h2>
-        <p className="text-lg opacity-70 max-w-2xl mx-auto mb-8">
-          Get personalized job recomendations and learnings roadmaps based on
-          your skills.
-        </p>
+    <div className="flex min-h-screen flex-col bg-black">
+      <header className="flex items-center justify-between px-5 py-4 sm:px-8">
+        <SiteLogo />
+        <Link
+          href="/"
+          className="text-sm font-medium text-orange-500 transition-colors hover:text-orange-400"
+        >
+          ← Home
+        </Link>
+      </header>
 
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button size={"lg"} className="gap-2 h-12 px-8">
-              <Sparkles size={18} />
-              Get Carrer Guidence
-              <ArrowRight size={18} />
-            </Button>
-          </DialogTrigger>
+      <div className="flex flex-1 flex-col items-center px-4 pb-16 pt-8 sm:px-6 sm:pt-12">
+        <div className="w-full max-w-xl rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+          <h1 className="text-center text-2xl font-semibold tracking-tight text-white sm:text-[1.65rem]">
+            Generate your path
+          </h1>
 
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-            {!response ? (
-              <>
-                <DialogHeader>
-                  <DialogTitle className="text-2xl flex items-center gap-2">
-                    <Sparkles className="text-blue-600" />
-                    Tell us about your skills
-                  </DialogTitle>
-                  <DialogDescription>
-                    Add your technical skills to recieve personalized carrer
-                    recomendations
-                  </DialogDescription>
-                </DialogHeader>
+          <div className="mt-8 space-y-2">
+            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-zinc-500">
+              Skills
+            </p>
+            <Input
+              value={skillsInput}
+              onChange={(e) => {
+                setSkillsInput(e.target.value);
+                setResponse(null);
+              }}
+              onKeyDown={handleKeyDown}
+              placeholder="e.g. React, TypeScript, Node.js, PostgreSQL"
+              className="h-12 rounded-xl border-white/10 bg-black/50 text-zinc-100 placeholder:text-zinc-600"
+            />
+          </div>
 
-                <div className="space-y-4 py-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="skill">Add Skills</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="skill"
-                        placeholder="e.g., React, Node.js, Python..."
-                        value={currentSkill}
-                        onChange={(e) => setCurrentSkill(e.target.value)}
-                        className="h-11"
-                        onKeyPress={handleKeyPress}
-                      />
-                      <Button onClick={addSkill} className="gap-2">
-                        Add
-                      </Button>
-                    </div>
-                  </div>
+          <label className="mt-5 flex cursor-pointer items-center gap-2.5 text-sm text-zinc-400">
+            <input
+              type="checkbox"
+              disabled
+              className="h-4 w-4 rounded border-white/20 bg-black/40 accent-orange-500"
+            />
+            <span>
+              Add{" "}
+              <span className="bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text font-medium text-transparent">
+                Gemini
+              </span>{" "}
+              polish.
+            </span>
+          </label>
 
-                  {skills.length > 0 && (
-                    <div className="space-y-2">
-                      <Label>Your Skills ({skills.length})</Label>
-                      <div className="flex flex-wrap gap-2">
-                        {skills.map((s) => (
-                          <div
-                            key={s}
-                            className="inline-flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-full bg-blue-100 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800"
-                          >
-                            <span className="text-sm font-medium">{s}</span>
-                            <button
-                              onClick={() => removeSkill(s)}
-                              className="h-5 w-5 rounded-full bg-red-500 text-white flex in-checked: justify-center"
-                            >
-                              <X size={13} />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+          <p className="mt-2 text-xs text-zinc-600">
+            Upgrade to enable —{" "}
+            <Link href="/subscribe" className="text-orange-500 hover:text-orange-400">
+              view plans
+            </Link>
+          </p>
 
-                  <Button
-                    onClick={getCarrerGuidance}
-                    disabled={loading || skills.length === 0}
-                    className="w-full h-11 gap-2"
-                  >
-                    {loading ? (
-                      <>
-                        <Loader2 size={18} className="animate-spin" /> Analyzing
-                        Your skills...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles size={18} /> Generate Carrer Guidence
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </>
+          <Button
+            onClick={getCarrerGuidance}
+            disabled={!canGenerate}
+            className="mt-6 h-12 w-full rounded-xl border border-white/10 bg-white/[0.06] text-sm font-medium text-zinc-300 shadow-none transition-all hover:bg-white/[0.1] disabled:cursor-not-allowed disabled:opacity-40 enabled:border-orange-500/30 enabled:bg-orange-500 enabled:text-black enabled:hover:bg-orange-400"
+          >
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <Loader2 size={16} className="animate-spin" />
+                Generating…
+              </span>
             ) : (
-              <>
-                <DialogHeader>
-                  <DialogTitle className="text-2xl flex items-center gap-2">
-                    <Target className="text-blue-600" />
-                    Your Personlized Carrer Guide
-                  </DialogTitle>
-                </DialogHeader>
-
-                <div className="space-y-6 py-4">
-                  {/* summary */}
-                  <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-b-blue-200 dark:border-b-blue-800">
-                    <div className="flex items-start gap-3">
-                      <Lightbulb
-                        className="text-blue-600 mt-1 shrink-0"
-                        size={20}
-                      />
-                      <div>
-                        <h3 className="font-semibold mb-2">Carrer Summary</h3>
-                        <p className="text-sm leading-relaxed opacity-90">
-                          {response.summary}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* job options */}
-                  <div>
-                    <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                      <Briefcase size={20} className="text-blue-600" />
-                      Recomended Carrer Paths
-                    </h3>
-                    <div className="space-y-3">
-                      {response.jobOptions.map((job, index) => (
-                        <div
-                          className="p-4 rounded-lg border hover:border-blue-500 transition-colors"
-                          key={index}
-                        >
-                          <h4 className="font-semibold text-base mb-2">
-                            {job.title}
-                          </h4>
-
-                          <div className="space-y-2 text-sm">
-                            <div>
-                              <span className="font-medium opacity-70">
-                                Responsibilities:
-                              </span>
-                              <span className="opacity-80">
-                                {job.responsibilities}
-                              </span>
-                            </div>
-                            <span className="font-medium opacity-70">
-                              Why this Role:
-                            </span>
-                            <span className="opacity-80">{job.why}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Skills to learn */}
-                  <div>
-                    <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                      <TrendingUp size={20} className="text-blue-600" />
-                      Skills to Enhance Your Carrer
-                    </h3>
-                    <div className="space-y-4">
-                      {response.skillsToLearn.map((category, index) => (
-                        <div className="space-y-2" key={index}>
-                          <h4 className="font-semibold text-sm text-blue-600">
-                            {category.category}
-                          </h4>
-                          <div className="space-y-2">
-                            {category.skills.map((skill, sindex) => (
-                              <div
-                                key={sindex}
-                                className="p-3 rounded-lg bg-secondary border text-sm"
-                              >
-                                <p className="font-medium mb-1">
-                                  {skill.title}
-                                </p>
-
-                                <p className="text-xs opacity-70 mb-1">
-                                  <span className="font-medium">Why: </span>
-                                  {skill.why}
-                                </p>
-
-                                <p className="text-xs opacity-70 mb-1">
-                                  <span className="font-medium">How: </span>
-                                  {skill.how}
-                                </p>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Learning approch */}
-                  <div className="p-4 rounded-lg border bg-blue-950/20 dark:bg-red-950/20">
-                    <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                      <BookOpen size={20} className="text-blue-600" />
-                      {response?.learningApproach?.title}
-                    </h3>
-
-                    <ul className="space-y-2">
-                      {response?.learningApproach?.points?.map(
-                        (point, index) => (
-                          <li
-                            key={index}
-                            className="text-sm flex items-start gap-2"
-                          >
-                            <span className="text-blue-600 mt-0.5">•</span>
-                            <span
-                              className="opacity-90"
-                              dangerouslySetInnerHTML={{ __html: point }}
-                            />
-                          </li>
-                        )
-                      )}
-                    </ul>
-                  </div>
-
-                  <Button
-                    onClick={resetDialog}
-                    variant={"outline"}
-                    className="w-full"
-                  >
-                    Start New Analysis
-                  </Button>
-                </div>
-              </>
+              "Generate guide"
             )}
-          </DialogContent>
-        </Dialog>
+          </Button>
+
+          <ApiLoadingMessages active={loading} className="mt-4 min-h-5" />
+        </div>
+
+        {response && (
+          <div className="mt-10 w-full max-w-2xl space-y-6">
+            <div className={`${glassCardSm} p-5`}>
+              <div className="flex items-start gap-3">
+                <Lightbulb className="mt-1 shrink-0 text-orange-400" size={20} />
+                <div>
+                  <h2 className="font-semibold text-white">Career Summary</h2>
+                  <p className="mt-2 text-sm leading-relaxed text-zinc-400">
+                    {response.summary}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="mb-3 flex items-center gap-2 font-semibold text-white">
+                <Briefcase size={18} className="text-orange-400" />
+                Recommended Paths
+              </h3>
+              <div className="space-y-3">
+                {response.jobOptions.map((job, index) => (
+                  <div key={index} className={`${glassCardSm} p-4`}>
+                    <h4 className="font-semibold text-orange-200">{job.title}</h4>
+                    <p className="mt-2 text-sm text-zinc-400">
+                      {job.responsibilities}
+                    </p>
+                    <p className="mt-2 text-xs text-zinc-500">
+                      <span className="text-zinc-400">Why: </span>
+                      {job.why}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="mb-3 flex items-center gap-2 font-semibold text-white">
+                <TrendingUp size={18} className="text-orange-400" />
+                Skills to Learn
+              </h3>
+              <div className="space-y-4">
+                {response.skillsToLearn.map((category, index) => (
+                  <div key={index}>
+                    <h4 className="mb-2 text-sm font-medium text-orange-300">
+                      {category.category}
+                    </h4>
+                    <div className="space-y-2">
+                      {category.skills.map((skill, sindex) => (
+                        <div key={sindex} className={`${glassCardSm} p-3 text-sm`}>
+                          <p className="font-medium text-zinc-200">{skill.title}</p>
+                          <p className="mt-1 text-xs text-zinc-500">{skill.why}</p>
+                          <p className="mt-1 text-xs text-zinc-500">{skill.how}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className={`${glassCardSm} p-5`}>
+              <h3 className="mb-3 flex items-center gap-2 font-semibold text-white">
+                <BookOpen size={18} className="text-orange-400" />
+                {response.learningApproach.title}
+              </h3>
+              <ul className="space-y-2">
+                {response.learningApproach.points.map((point, index) => (
+                  <li
+                    key={index}
+                    className="flex items-start gap-2 text-sm text-zinc-400"
+                  >
+                    <span className="text-orange-400">•</span>
+                    <span dangerouslySetInnerHTML={{ __html: point }} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => {
+                setResponse(null);
+                setSkillsInput("");
+              }}
+            >
+              Start New Analysis
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

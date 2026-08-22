@@ -137,11 +137,11 @@ const Company = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       <Card className="shadow-lg border-2 overflow-hidden">
-        <div className="bg-blue-500 p-6 border-b">
+        <div className="bg-orange-500/90 p-6 border-b">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                <Building2 size={20} className="text-blue-600" />
+              <div className="h-10 w-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
+                <Building2 size={20} className="text-orange-400" />
               </div>
             </div>
             <CardTitle className="text-2xl text-white">My Companies</CardTitle>
@@ -167,7 +167,7 @@ const Company = () => {
                 {companies.map((c) => (
                   <div
                     key={c.company_id}
-                    className="flex items-center gap-4 p-4 rounded-lg border-2 hover:border-blue-500 transition-all bg-background"
+                    className="flex items-center gap-4 p-4 rounded-lg border-2 hover:border-orange-500/30 transition-all bg-background"
                   >
                     <div className="h-16 w-16 rounded-full border-2 overflow-hidden shrink-0 bg-background">
                       <img
@@ -188,7 +188,7 @@ const Company = () => {
                       <a
                         href={c.website}
                         target="_blank"
-                        className="text-xs text-blue-500 hover:underline flex items-center gap-1"
+                        className="text-xs text-orange-400 hover:text-orange-300 flex items-center gap-1"
                       >
                         <Globe size={12} />
                         {c.website}
@@ -246,7 +246,7 @@ const Company = () => {
         <DialogContent className="sm:max-w-[550px]">
           <DialogHeader>
             <DialogTitle className="text-2xl flex items-center gap-2">
-              <Building2 className="text-blue-600" />
+              <Building2 className="text-orange-400" />
               Add New Company
             </DialogTitle>
           </DialogHeader>

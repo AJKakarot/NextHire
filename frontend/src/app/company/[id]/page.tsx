@@ -6,6 +6,8 @@ import { job_service, useAppData } from "@/context/AppContext";
 import { Company, Job } from "@/type";
 import axios from "axios";
 import Loading from "@/components/loading";
+import PageBackground from "@/components/page-background";
+import { glassCardSm } from "@/lib/brand";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -214,11 +216,12 @@ const CompanyPage = () => {
 
   if (loading) return <Loading />;
   return (
-    <div className="min-h-screen bg-secondary/30">
+    <div className="relative min-h-screen">
+      <PageBackground />
       {company && (
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          <Card className="overflow-hidden shadow-lg border-2 mb-8">
-            <div className="h-32 bg-blue-600"></div>
+        <div className="relative mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+          <Card className="mb-8 overflow-hidden border-white/[0.08] bg-white/[0.04] shadow-lg shadow-black/20">
+            <div className="h-32 bg-gradient-to-r from-orange-500/80 to-orange-600/60" />
             <div className="px-8 pb-8">
               <div className="flex flex-col md:flex-row gap-6 items-start md:items-end -mt-16">
                 <div className="w-32 h-32 rounded-2xl border-4 border-background overflow-hidden shadow-xl bg-background shrink-0">
@@ -251,12 +254,12 @@ const CompanyPage = () => {
 
           <Dialog>
             {/* Job section */}
-            <Card className="shadow-lg border-2 overflow-hidden">
-              <div className="bg-blue-600 border-b p-6">
-                <div className="flex items-center justify-between flex-wrap gap-4">
+            <Card className="overflow-hidden border-white/[0.08] bg-white/[0.04] shadow-lg shadow-black/20">
+              <div className="border-b border-white/10 bg-gradient-to-r from-orange-500/90 to-orange-600/80 p-6">
+                <div className="flex flex-wrap items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                      <Briefcase size={20} className="text-blue-600" />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-500/15">
+                      <Briefcase size={20} className="text-orange-400" />
                     </div>
                   </div>
                   <h2 className="text-2xl font-bold text-white">
@@ -463,7 +466,7 @@ const CompanyPage = () => {
                     {company.jobs.map((j) => (
                       <div
                         key={j.job_id}
-                        className="p-5 rounded-lg border-2 hover:border-blue-500 transition-all bg-background"
+                        className="rounded-lg border border-white/[0.08] bg-white/[0.03] p-5 transition-all hover:-translate-y-0.5 hover:border-orange-500/30"
                       >
                         <div className="flex items-start justify-between gap-4 flex-wrap">
                           <div className="flex-1 min-w-0">
