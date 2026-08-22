@@ -6,6 +6,35 @@ dotenv.config();
 
 let transporter: Transporter | null = null;
 
+const sendWithResend = async ({
+  to,
+  subject,
+  html,
+}: {
+  to: string;
+  subject: string;
+  html: string;
+}) => {
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: process.env.RESEND_FROM || "NextHire <onboarding@resend.dev>",
+      to: [to],
+      subject,
+      html,
+    }),
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Resend failed: ${body}`);
+  }
+};
+
 const getTransporter = () => {
   if (transporter) return transporter;
 
@@ -21,6 +50,9 @@ const getTransporter = () => {
     port: 587,
     secure: false,
     requireTLS: true,
+    connectionTimeout: 8000,
+    greetingTimeout: 8000,
+    socketTimeout: 8000,
     auth: { user, pass },
   });
 
@@ -36,6 +68,11 @@ export const sendMail = async ({
   subject: string;
   html: string;
 }) => {
+  if (process.env.RESEND_API_KEY) {
+    await sendWithResend({ to, subject, html });
+    return;
+  }
+
   const mailer = getTransporter();
   await mailer.sendMail({
     from: `nextHire <${process.env.SMTP_USER}>`,
