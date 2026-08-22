@@ -50,10 +50,25 @@ export const createCompany = TryCatch(
       throw new ErrorHandler(500, "Failed to create file buffer");
     }
 
-    const { data } = await axios.post(
-      `${process.env.UPLOAD_SERVICE}/api/utils/upload`,
-      { buffer: fileBuffer.content }
-    );
+    if (!process.env.UPLOAD_SERVICE) {
+      throw new ErrorHandler(500, "UPLOAD_SERVICE is not configured");
+    }
+
+    let data: { url: string; public_id: string };
+    try {
+      const uploadRes = await axios.post(
+        `${process.env.UPLOAD_SERVICE}/api/utils/upload`,
+        { buffer: fileBuffer.content },
+        { timeout: 60000 }
+      );
+      data = uploadRes.data;
+    } catch (error: any) {
+      throw new ErrorHandler(
+        503,
+        error.response?.data?.message ||
+          "Logo upload failed. Check UPLOAD_SERVICE and try again."
+      );
+    }
 
     const [newCompany] =
       await sql`INSERT INTO companies (name, description, website, logo, logo_public_id, recruiter_id) VALUES (${name}, ${description}, ${website}, ${data.url}, ${data.public_id}, ${req.user?.user_id}) RETURNING *`;
