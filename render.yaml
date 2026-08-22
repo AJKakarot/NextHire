@@ -5,7 +5,7 @@ services:
     plan: free
     rootDir: services/utils
     buildCommand: npm install && npx tsc
-    startCommand: node dist/index.js
+    startCommand: npx tsc && node dist/index.js
     envVars:
       - key: NODE_ENV
         value: production
@@ -16,7 +16,7 @@ services:
     plan: free
     rootDir: services/auth
     buildCommand: npm install && npx tsc
-    startCommand: node dist/index.js
+    startCommand: npx tsc && node dist/index.js
     envVars:
       - key: NODE_ENV
         value: production
@@ -27,7 +27,7 @@ services:
     plan: free
     rootDir: services/user
     buildCommand: npm install && npx tsc
-    startCommand: node dist/index.js
+    startCommand: npx tsc && node dist/index.js
     envVars:
       - key: NODE_ENV
         value: production
@@ -38,7 +38,7 @@ services:
     plan: free
     rootDir: services/job
     buildCommand: npm install && npx tsc
-    startCommand: node dist/index.js
+    startCommand: npx tsc && node dist/index.js
     envVars:
       - key: NODE_ENV
         value: production
@@ -49,7 +49,7 @@ services:
     plan: free
     rootDir: services/payment
     buildCommand: npm install && npx tsc
-    startCommand: node dist/index.js
+    startCommand: npx tsc && node dist/index.js
     envVars:
       - key: NODE_ENV
         value: production
