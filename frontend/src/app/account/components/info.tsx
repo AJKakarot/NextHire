@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAppData } from "@/context/AppContext";
 import { glassCardAccount } from "@/lib/brand";
+import { resumeViewHref } from "@/lib/resume-url";
 import { AccontProps } from "@/type";
 import {
   AlertTriangle,
@@ -207,7 +208,7 @@ const Info: React.FC<AccontProps> = ({ user, isYourAccount }) => {
                 <div className="flex-1">
                   <p className="text-sm font-medium">Resume Document</p>
                   <Link
-                    href={user.resume}
+                    href={resumeViewHref(user.resume)}
                     className="text-sm text-orange-400 hover:underline"
                     target="_blank"
                   >

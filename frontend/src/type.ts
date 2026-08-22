@@ -134,6 +134,8 @@ export interface Application {
   job_id: number;
   applicant_id: number;
   applicant_email: string;
+  applicant_name?: string;
+  applicant_pic?: string;
   status: ApplicationStatus;
   resume: string;
   applied_at: string;

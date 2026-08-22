@@ -21,6 +21,7 @@ import toast from "react-hot-toast";
 import Link from "next/link";
 import PageBackground from "@/components/page-background";
 import { glassCardSm } from "@/lib/brand";
+import { resumeViewHref } from "@/lib/resume-url";
 
 const JobPage = () => {
   const { id } = useParams();
@@ -276,9 +277,21 @@ const JobPage = () => {
                     className={`${glassCardSm} p-4`}
                     key={e.application_id}
                   >
-                    <div className="mb-3 flex items-center justify-between">
+                    <div className="mb-3 flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-base font-semibold text-white">
+                          {e.applicant_name ||
+                            e.applicant_email?.split("@")[0] ||
+                            "Applicant"}
+                        </p>
+                        {e.applicant_email && (
+                          <p className="truncate text-sm text-zinc-400">
+                            {e.applicant_email}
+                          </p>
+                        )}
+                      </div>
                       <span
-                        className={`rounded-full px-3 py-1 text-sm font-medium ${
+                        className={`shrink-0 rounded-full px-3 py-1 text-sm font-medium ${
                           e.status === "Hired"
                             ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
                             : e.status === "Rejected"
@@ -293,7 +306,7 @@ const JobPage = () => {
                     <div className="flex gap-3 mb-3">
                       <Link
                         target="_blank"
-                        href={e.resume}
+                        href={resumeViewHref(e.resume)}
                         className="text-orange-400 hover:text-orange-300 text-sm"
                       >
                         View Resume

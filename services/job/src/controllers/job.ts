@@ -303,8 +303,13 @@ export const getAllApplicationForJob = TryCatch(
       throw new ErrorHandler(403, "Forbidden you are not allowed");
     }
 
-    const applications =
-      await sql`SELECT * FROM applications WHERE job_id = ${jobId} ORDER BY subscribed DESC, applied_at ASC`;
+    const applications = await sql`
+      SELECT a.*, u.name AS applicant_name, u.profile_pic AS applicant_pic
+      FROM applications a
+      LEFT JOIN users u ON a.applicant_id = u.user_id
+      WHERE a.job_id = ${jobId}
+      ORDER BY a.subscribed DESC, a.applied_at ASC
+    `;
 
     res.json(applications);
   }

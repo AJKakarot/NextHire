@@ -24,6 +24,52 @@ router.post("/upload", async (req, res) => {
   }
 });
 
+function cloudinaryPublicId(url: string) {
+  const match = url.match(
+    /\/image\/upload\/(?:v\d+\/)?(.+?)(?:\.pdf)?(?:\?|$)/i
+  );
+  return match?.[1];
+}
+
+router.get("/resume", async (req, res) => {
+  try {
+    const src = String(req.query.url || "");
+    if (!src.includes("res.cloudinary.com")) {
+      return res.status(400).json({ message: "Invalid resume URL" });
+    }
+
+    const publicId = cloudinaryPublicId(src);
+    if (!publicId) {
+      return res.status(400).json({ message: "Could not parse resume URL" });
+    }
+
+    const downloadUrl = cloudinary.v2.utils.private_download_url(
+      publicId,
+      "pdf",
+      {
+        resource_type: "image",
+        type: "upload",
+        attachment: false,
+        expires_at: Math.floor(Date.now() / 1000) + 300,
+      }
+    );
+
+    const fileRes = await fetch(downloadUrl);
+    if (!fileRes.ok) {
+      return res.status(502).json({
+        message: "Could not fetch resume from storage",
+      });
+    }
+
+    const buf = Buffer.from(await fileRes.arrayBuffer());
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", 'inline; filename="resume.pdf"');
+    res.send(buf);
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
 

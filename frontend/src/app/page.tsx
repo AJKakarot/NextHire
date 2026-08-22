@@ -1,7 +1,6 @@
 "use client";
 
 import Hero from "@/components/hero";
-import { FeaturesSection } from "@/components/landing/FeaturesSection";
 import Loading from "@/components/loading";
 import PageBackground from "@/components/page-background";
 import ResumeAnalyzer from "@/components/resume-analyser";
@@ -83,8 +82,6 @@ const Home = () => {
               </div>
             </div>
           </section>
-
-          <FeaturesSection showPricing={false} />
 
           <section className="mx-auto max-w-3xl px-4 pb-20 pt-4 text-center sm:px-6">
             <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl md:text-4xl">
