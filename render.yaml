@@ -4,8 +4,8 @@ services:
     runtime: node
     plan: free
     rootDir: services/utils
-    buildCommand: npm run build
-    startCommand: npm start
+    buildCommand: npm install && npx tsc
+    startCommand: node dist/index.js
     envVars:
       - key: NODE_ENV
         value: production
@@ -15,8 +15,8 @@ services:
     runtime: node
     plan: free
     rootDir: services/auth
-    buildCommand: npm run build
-    startCommand: npm start
+    buildCommand: npm install && npx tsc
+    startCommand: node dist/index.js
     envVars:
       - key: NODE_ENV
         value: production
@@ -26,8 +26,8 @@ services:
     runtime: node
     plan: free
     rootDir: services/user
-    buildCommand: npm run build
-    startCommand: npm start
+    buildCommand: npm install && npx tsc
+    startCommand: node dist/index.js
     envVars:
       - key: NODE_ENV
         value: production
@@ -37,8 +37,8 @@ services:
     runtime: node
     plan: free
     rootDir: services/job
-    buildCommand: npm run build
-    startCommand: npm start
+    buildCommand: npm install && npx tsc
+    startCommand: node dist/index.js
     envVars:
       - key: NODE_ENV
         value: production
@@ -48,8 +48,8 @@ services:
     runtime: node
     plan: free
     rootDir: services/payment
-    buildCommand: npm run build
-    startCommand: npm start
+    buildCommand: npm install && npx tsc
+    startCommand: node dist/index.js
     envVars:
       - key: NODE_ENV
         value: production
