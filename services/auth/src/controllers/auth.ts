@@ -46,15 +46,33 @@ export const registerUser = TryCatch(async (req, res, next) => {
       throw new ErrorHandler(500, "Failed to generate buffer");
     }
 
-    const { data } = await axios.post(
-      `${process.env.UPLOAD_SERVICE}/api/utils/upload`,
-      { buffer: fileBuffer.content }
-    );
+    if (!process.env.UPLOAD_SERVICE) {
+      throw new ErrorHandler(500, "UPLOAD_SERVICE is not configured");
+    }
+
+    let data: { url: string; public_id: string };
+    try {
+      const uploadRes = await axios.post(
+        `${process.env.UPLOAD_SERVICE}/api/utils/upload`,
+        { buffer: fileBuffer.content },
+        { timeout: 60000 }
+      );
+      data = uploadRes.data;
+    } catch (error: any) {
+      throw new ErrorHandler(
+        503,
+        error.response?.data?.message ||
+          "Resume upload failed. Set Auth UPLOAD_SERVICE to the Utils URL."
+      );
+    }
+
     const [user] =
       await sql`INSERT INTO users (name, email, password, phone_number, role, bio, resume, resume_public_id) VALUES 
                (${name}, ${email}, ${hashPassword}, ${phoneNumber}, ${role}, ${bio}, ${data.url}, ${data.public_id}) RETURNING user_id, name, email, phone_number, role, bio, resume, created_at`;
 
     registeredUser = user;
+  } else {
+    throw new ErrorHandler(400, "Invalid role");
   }
 
   const token = jwt.sign(
