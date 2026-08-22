@@ -112,14 +112,16 @@ const NavBar = () => {
                   </PopoverContent>
                 </Popover>
               ) : (
-                <Link href="/login">
-                  <Button variant="outline" className={loginBtnClass}>
-                    Login
-                  </Button>
-                </Link>
-                <Link href="/register">
-                  <Button className={signupBtnClass}>Signup</Button>
-                </Link>
+                <>
+                  <Link href="/login">
+                    <Button variant="outline" className={loginBtnClass}>
+                      Login
+                    </Button>
+                  </Link>
+                  <Link href="/register">
+                    <Button className={signupBtnClass}>Signup</Button>
+                  </Link>
+                </>
               )}
             </>
           )}
@@ -167,17 +169,19 @@ const NavBar = () => {
               </Button>
             </>
           ) : (
-            <Link href="/login" onClick={() => setIsOpen(false)}>
-              <Button
-                variant="outline"
-                className="mt-1 h-11 w-full rounded-full"
-              >
-                Login
-              </Button>
-            </Link>
-            <Link href="/register" onClick={() => setIsOpen(false)}>
-              <Button className="h-11 w-full rounded-full">Signup</Button>
-            </Link>
+            <>
+              <Link href="/login" onClick={() => setIsOpen(false)}>
+                <Button
+                  variant="outline"
+                  className="mt-1 h-11 w-full rounded-full"
+                >
+                  Login
+                </Button>
+              </Link>
+              <Link href="/register" onClick={() => setIsOpen(false)}>
+                <Button className="h-11 w-full rounded-full">Signup</Button>
+              </Link>
+            </>
           )}
         </div>
       </div>
