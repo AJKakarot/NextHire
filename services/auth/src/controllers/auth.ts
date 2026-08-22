@@ -163,7 +163,12 @@ export const forgotPassword = TryCatch(async (req, res, next) => {
   const frontendUrl = (process.env.Frontend_Url || "").replace(/\/$/, "");
   const resetLink = `${frontendUrl}/reset/${resetToken}`;
 
-  await redisClient.set(`forgot:${email}`, resetToken, { ex: 900 });
+  try {
+    await redisClient.set(`forgot:${email}`, resetToken, { ex: 900 });
+  } catch (error: any) {
+    console.error("failed to store reset token", error);
+    throw new ErrorHandler(500, "Reset token store failed. Check Upstash Redis.");
+  }
 
   try {
     await sendMail({
@@ -173,10 +178,8 @@ export const forgotPassword = TryCatch(async (req, res, next) => {
     });
   } catch (error: any) {
     console.error("failed to send mail", error);
-    throw new ErrorHandler(
-      500,
-      "Could not send reset email. Check SMTP settings on Auth."
-    );
+    const smtpMessage = error.response || error.message || "SMTP error";
+    throw new ErrorHandler(500, `Could not send reset email: ${smtpMessage}`);
   }
 
   res.json({
