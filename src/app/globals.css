@@ -1,0 +1,177 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-syne);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+:root {
+  --radius: 0.75rem;
+  --background: #080b14;
+  --foreground: #f4f4f5;
+  --card: rgba(255, 255, 255, 0.04);
+  --card-foreground: #f4f4f5;
+  --popover: #0c0f18;
+  --popover-foreground: #f4f4f5;
+  --primary: #f97316;
+  --primary-foreground: #0a0a0a;
+  --secondary: rgba(255, 255, 255, 0.06);
+  --secondary-foreground: #e4e4e7;
+  --muted: rgba(255, 255, 255, 0.05);
+  --muted-foreground: #a1a1aa;
+  --accent: rgba(249, 115, 22, 0.12);
+  --accent-foreground: #fdba74;
+  --destructive: #fb7185;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.15);
+  --ring: rgba(249, 115, 22, 0.45);
+}
+
+.dark {
+  --background: #080b14;
+  --foreground: #f4f4f5;
+  --card: rgba(255, 255, 255, 0.04);
+  --card-foreground: #f4f4f5;
+  --popover: #0c0f18;
+  --popover-foreground: #f4f4f5;
+  --primary: #f97316;
+  --primary-foreground: #0a0a0a;
+  --secondary: rgba(255, 255, 255, 0.06);
+  --secondary-foreground: #e4e4e7;
+  --muted: rgba(255, 255, 255, 0.05);
+  --muted-foreground: #a1a1aa;
+  --accent: rgba(249, 115, 22, 0.12);
+  --accent-foreground: #fdba74;
+  --destructive: #fb7185;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.15);
+  --ring: rgba(249, 115, 22, 0.45);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply scroll-smooth;
+  }
+  body {
+    @apply min-h-screen bg-background font-sans text-foreground antialiased;
+    background-image: linear-gradient(to bottom, #000000, #000000, #030712);
+  }
+}
+
+.page-shell {
+  @apply relative min-h-screen bg-gradient-to-b from-black via-black to-gray-950;
+}
+
+.icon-style {
+  @apply absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-500;
+}
+
+@keyframes glow-ai-halo {
+  0%,
+  100% {
+    opacity: 0.42;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.78;
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+}
+
+@keyframes glow-ai-text {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.35))
+      drop-shadow(0 0 20px rgba(249, 115, 22, 0.15));
+  }
+  50% {
+    filter: drop-shadow(0 0 14px rgba(249, 115, 22, 0.55))
+      drop-shadow(0 0 32px rgba(249, 115, 22, 0.28));
+  }
+}
+
+.animate-glow-ai-halo {
+  animation: glow-ai-halo 3.2s ease-in-out infinite;
+}
+
+.animate-glow-ai-text {
+  animation: glow-ai-text 3.2s ease-in-out infinite;
+}
+
+.nexthire-logo-static {
+  transition: text-shadow 0.35s ease, filter 0.35s ease;
+  text-shadow:
+    0 0 3px rgba(255, 255, 255, 0.55),
+    0 0 10px rgba(255, 255, 255, 0.38),
+    0 0 22px rgba(255, 255, 255, 0.2),
+    0 0 36px rgba(255, 255, 255, 0.08);
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.38))
+    drop-shadow(0 0 12px rgba(255, 255, 255, 0.16));
+}
+
+.nexthire-logo-static:hover {
+  text-shadow:
+    0 0 4px rgba(255, 255, 255, 0.68),
+    0 0 12px rgba(255, 255, 255, 0.48),
+    0 0 26px rgba(255, 255, 255, 0.26),
+    0 0 42px rgba(255, 255, 255, 0.11);
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.52))
+    drop-shadow(0 0 16px rgba(255, 255, 255, 0.22));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-glow-ai-halo,
+  .animate-glow-ai-text {
+    animation: none !important;
+  }
+}
+
+@keyframes terminal-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.terminal-cursor {
+  animation: terminal-blink 1s step-end infinite;
+}
+
+.glass-panel {
+  @apply rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-md;
+}
+
+.glass-panel-sm {
+  @apply rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-sm;
+}
