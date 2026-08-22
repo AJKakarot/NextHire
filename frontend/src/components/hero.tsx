@@ -5,6 +5,7 @@ import React from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import { useAppData } from "@/context/AppContext";
 
 const pillPrimary =
   "h-11 rounded-full border-0 bg-orange-500 px-7 text-sm font-medium text-black shadow-none transition-all hover:bg-orange-400 hover:scale-[1.02]";
@@ -13,6 +14,44 @@ const pillOutline =
   "h-11 rounded-full border border-white/20 bg-transparent px-7 text-sm font-medium text-white shadow-none transition-all hover:border-white/35 hover:bg-white/[0.04] hover:scale-[1.02]";
 
 const Hero = () => {
+  const { user, isAuth } = useAppData();
+  const isRecruiter = isAuth && user?.role === "recruiter";
+
+  if (isRecruiter) {
+    return (
+      <section className="mx-auto max-w-3xl px-4 pb-10 pt-10 sm:px-6 sm:pt-14">
+        <div className="relative text-center">
+          <h1 className="text-[clamp(1.75rem,5vw,3rem)] font-semibold leading-tight tracking-tight text-white">
+            Hire{" "}
+            <span className="bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text text-transparent">
+              talent
+            </span>{" "}
+            faster
+          </h1>
+          <p className="mx-auto mt-3 max-w-md text-sm text-zinc-400 sm:text-base">
+            Browse open roles, post jobs, and manage applicants. No resume
+            analyzer or applications from this account.
+          </p>
+          <div className="mx-auto mt-6 flex flex-col items-stretch justify-center gap-2.5 sm:flex-row sm:items-center sm:gap-3">
+            <Link href="/jobs" className="sm:w-auto">
+              <Button className={`w-full sm:w-auto ${pillPrimary}`}>
+                Browse Jobs
+              </Button>
+            </Link>
+            <Link href="/account" className="sm:w-auto">
+              <Button
+                variant="outline"
+                className={`w-full sm:w-auto ${pillOutline}`}
+              >
+                My companies
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="mx-auto max-w-3xl px-4 pb-4 pt-10 sm:px-6 sm:pt-14">
       <div className="relative text-center">
@@ -34,7 +73,7 @@ const Hero = () => {
         </h1>
 
         <p className="mx-auto mt-3 max-w-md text-sm text-zinc-400 sm:text-base">
-          Get ATS score and improve instantly
+          Get ATS score, then find and apply to jobs
         </p>
 
         <div className="mx-auto mt-6 flex flex-col items-stretch justify-center gap-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
@@ -44,12 +83,18 @@ const Hero = () => {
             </Button>
           </Link>
           <Link href="/career-guide" className="sm:w-auto">
-            <Button variant="outline" className={`w-full sm:w-auto ${pillOutline}`}>
+            <Button
+              variant="outline"
+              className={`w-full sm:w-auto ${pillOutline}`}
+            >
               Career guide
             </Button>
           </Link>
           <a href="#resume-analyzer" className="sm:w-auto">
-            <Button variant="outline" className={`w-full sm:w-auto ${pillOutline}`}>
+            <Button
+              variant="outline"
+              className={`w-full sm:w-auto ${pillOutline}`}
+            >
               Upload Resume
             </Button>
           </a>
@@ -94,11 +139,6 @@ const Hero = () => {
               polish.
             </span>
           </label>
-
-          <p className="text-left text-xs text-zinc-600">
-            Use <span className="text-zinc-500">Continue with Google</span> in the
-            header to enable Gemini polish.
-          </p>
         </div>
       </div>
     </section>

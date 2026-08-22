@@ -56,8 +56,8 @@ const LoginPage = () => {
 
   return (
     <AuthShell
-      title="Welcome back"
-      subtitle="Sign in to continue your journey"
+      title="Login"
+      subtitle="Login to continue your journey"
     >
       <form onSubmit={submitHandler} className="space-y-5">
         <div className="space-y-2">
@@ -106,7 +106,7 @@ const LoginPage = () => {
         </div>
 
         <Button disabled={btnLoading} className="w-full" size="lg">
-          {btnLoading ? "Signing in..." : "Sign In"}
+          {btnLoading ? "Logging in..." : "Login"}
           <ArrowRight size={18} />
         </Button>
       </form>
@@ -118,7 +118,7 @@ const LoginPage = () => {
             href="/register"
             className="font-medium text-orange-400 hover:text-orange-300"
           >
-            Create account
+            Signup
           </Link>
         </p>
       </div>

@@ -1,5 +1,10 @@
 import CarrerGuide from "@/components/carrer-guide";
+import RecruiterAway from "@/components/recruiter-away";
 
 export default function CareerGuidePage() {
-  return <CarrerGuide />;
+  return (
+    <RecruiterAway>
+      <CarrerGuide />
+    </RecruiterAway>
+  );
 }

@@ -175,6 +175,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   }
 
   async function applyJob(job_id: number) {
+    if (user?.role !== "jobseeker") {
+      toast.error("Only job seekers can apply");
+      return;
+    }
     setBtnLoading(true);
     try {
       const { data } = await axios.post(

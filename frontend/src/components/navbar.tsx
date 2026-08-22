@@ -13,14 +13,26 @@ import { cn } from "@/lib/utils";
 const navLinkClass =
   "shrink-0 cursor-pointer whitespace-nowrap px-3 py-2 text-sm font-medium text-zinc-400 transition-colors hover:text-white";
 
-const googleBtnClass =
+const loginBtnClass =
   "h-9 rounded-full border border-white/15 bg-white/[0.06] px-4 text-xs font-medium text-white shadow-none transition-all hover:border-white/25 hover:bg-white/[0.1] sm:h-10 sm:px-5 sm:text-sm";
+
+const signupBtnClass =
+  "h-9 rounded-full border-0 bg-orange-500 px-4 text-xs font-medium text-black shadow-none transition-all hover:bg-orange-400 sm:h-10 sm:px-5 sm:text-sm";
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   const { isAuth, user, loading, logoutUser } = useAppData();
+  const isRecruiter = isAuth && user?.role === "recruiter";
+
+  const navLinks = isRecruiter
+    ? [{ href: "/jobs", label: "Browse Jobs" }]
+    : [
+        { href: "/features", label: "Features" },
+        { href: "/subscribe", label: "Pricing" },
+        { href: "/jobs", label: "Browse Jobs" },
+      ];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -44,12 +56,11 @@ const NavBar = () => {
           className="hidden min-w-0 flex-1 justify-center gap-1 md:flex md:gap-6"
           aria-label="Primary"
         >
-          <Link href="/#features" className={navLinkClass}>
-            Features
-          </Link>
-          <Link href="/subscribe" className={navLinkClass}>
-            Pricing
-          </Link>
+          {navLinks.map(({ href, label }) => (
+            <Link key={href} href={href} className={navLinkClass}>
+              {label}
+            </Link>
+          ))}
         </nav>
 
         <div className="hidden shrink-0 items-center gap-2 md:flex">
@@ -102,9 +113,12 @@ const NavBar = () => {
                 </Popover>
               ) : (
                 <Link href="/login">
-                  <Button variant="outline" className={googleBtnClass}>
-                    Continue with Google
+                  <Button variant="outline" className={loginBtnClass}>
+                    Login
                   </Button>
+                </Link>
+                <Link href="/register">
+                  <Button className={signupBtnClass}>Signup</Button>
                 </Link>
               )}
             </>
@@ -123,15 +137,11 @@ const NavBar = () => {
       <div
         className={cn(
           "overflow-hidden border-t border-white/10 transition-all duration-300 ease-out md:hidden",
-          isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+          isOpen ? "max-h-[28rem] opacity-100" : "max-h-0 opacity-0"
         )}
       >
         <div className="space-y-1 bg-black/95 px-4 py-3 backdrop-blur-md">
-          {[
-            { href: "/#features", label: "Features" },
-            { href: "/subscribe", label: "Pricing" },
-            { href: "/jobs", label: "Browse Jobs" },
-          ].map(({ href, label }) => (
+          {navLinks.map(({ href, label }) => (
             <Link key={href} href={href} onClick={() => setIsOpen(false)}>
               <Button variant="ghost" className="h-11 w-full justify-start">
                 {label}
@@ -158,9 +168,15 @@ const NavBar = () => {
             </>
           ) : (
             <Link href="/login" onClick={() => setIsOpen(false)}>
-              <Button className="mt-1 h-11 w-full rounded-full">
-                Continue with Google
+              <Button
+                variant="outline"
+                className="mt-1 h-11 w-full rounded-full"
+              >
+                Login
               </Button>
+            </Link>
+            <Link href="/register" onClick={() => setIsOpen(false)}>
+              <Button className="h-11 w-full rounded-full">Signup</Button>
             </Link>
           )}
         </div>

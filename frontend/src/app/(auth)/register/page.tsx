@@ -97,8 +97,8 @@ const RegisterPage = () => {
 
   return (
     <AuthShell
-      title="Create your account"
-      subtitle="Create your account to start a new journey"
+      title="Signup"
+      subtitle="Signup to start a new journey"
     >
           <form onSubmit={submitHandler} className="space-y-5">
             <div className="space-y-2">
@@ -266,7 +266,7 @@ const RegisterPage = () => {
                 )}
 
                 <Button disabled={btnLoading} className="w-full">
-                  {btnLoading ? "Please Wait..." : "Register"}
+                  {btnLoading ? "Please wait..." : "Signup"}
                   <ArrowRight size={18} />
                 </Button>
               </div>

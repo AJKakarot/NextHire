@@ -3,7 +3,7 @@ import { Job } from "@/type";
 import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
-import { job_service } from "@/context/AppContext";
+import { job_service, useAppData } from "@/context/AppContext";
 import { Button } from "@/components/ui/button";
 import { Briefcase, MapPin, Search, X } from "lucide-react";
 import Loading from "@/components/loading";
@@ -25,6 +25,8 @@ const locations: string[] = [
 ];
 
 const JobsPage = () => {
+  const { user, isAuth } = useAppData();
+  const isRecruiter = isAuth && user?.role === "recruiter";
   const [loading, setLoading] = useState(true);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [title, setTitle] = useState("");
@@ -78,12 +80,27 @@ const JobsPage = () => {
       <div className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">
-            Explore{" "}
-            <span className="bg-gradient-to-r from-orange-300 to-orange-500 bg-clip-text text-transparent">
-              Opportunities
-            </span>
+            {isRecruiter ? (
+              <>
+                Browse{" "}
+                <span className="bg-gradient-to-r from-orange-300 to-orange-500 bg-clip-text text-transparent">
+                  Jobs
+                </span>
+              </>
+            ) : (
+              <>
+                Explore{" "}
+                <span className="bg-gradient-to-r from-orange-300 to-orange-500 bg-clip-text text-transparent">
+                  Opportunities
+                </span>
+              </>
+            )}
           </h1>
-          <p className="mt-2 text-zinc-400">{jobs.length} jobs found</p>
+          <p className="mt-2 text-zinc-400">
+            {isRecruiter
+              ? `${jobs.length} open roles in the market`
+              : `${jobs.length} jobs found`}
+          </p>
         </div>
 
         <div className={`${glassCardSm} mb-8 grid gap-4 p-5 md:grid-cols-[1fr_1fr_auto_auto]`}>
