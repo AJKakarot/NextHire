@@ -10,7 +10,7 @@ import AppliedJobs from "./components/appliedJobs";
 import PageBackground from "@/components/page-background";
 
 const AccountPage = () => {
-  const { isAuth, user, loading, applications } = useAppData();
+  const { isAuth, user, loading, applications, fetchApplications } = useAppData();
 
   const router = useRouter();
 
@@ -19,6 +19,10 @@ const AccountPage = () => {
       router.push("/login");
     }
   }, [isAuth, router, loading]);
+
+  useEffect(() => {
+    if (isAuth) fetchApplications();
+  }, [isAuth]);
 
   if (loading) return <Loading />;
   return (

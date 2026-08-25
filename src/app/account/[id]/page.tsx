@@ -7,6 +7,7 @@ import Cookies from "js-cookie";
 import Loading from "@/components/loading";
 import Info from "../components/info";
 import Skills from "../components/skills";
+import PageBackground from "@/components/page-background";
 
 const UserAccount = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -37,16 +38,17 @@ const UserAccount = () => {
 
   if (loading) return <Loading />;
   return (
-    <>
+    <div className="relative min-h-screen">
+      <PageBackground />
       {user && (
-        <div className="w-[90%] md:w-[60%] m-auto">
+        <div className="relative mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">
           <Info user={user} isYourAccount={false} />
           {user.role === "jobseeker" && (
             <Skills user={user} isYourAccount={false} />
           )}
         </div>
       )}
-    </>
+    </div>
   );
 };
 

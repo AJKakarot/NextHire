@@ -135,19 +135,21 @@ const Company = () => {
 
   if (loading) return <Loading />;
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
-      <Card className="shadow-lg border-2 overflow-hidden">
-        <div className="bg-orange-500/90 p-6 border-b">
-          <div className="flex items-center justify-between flex-wrap gap-4">
+    <div className="mb-6">
+      <Card className="gap-0 overflow-hidden border-2 py-0 shadow-lg">
+        <div className="border-b bg-orange-500/90 px-6 py-4">
+          <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
-                <Building2 size={20} className="text-orange-400" />
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/15">
+                <Building2 size={20} className="text-white" />
+              </div>
+              <div>
+                <CardTitle className="text-2xl text-white">My Companies</CardTitle>
+                <CardDescription className="mt-1 text-sm text-white/80">
+                  Manage your registered companies ({companies.length}/3)
+                </CardDescription>
               </div>
             </div>
-            <CardTitle className="text-2xl text-white">My Companies</CardTitle>
-            <CardDescription className="text-sm mt-1 text-white">
-              Manage your registered companies ({companies.length}/3)
-            </CardDescription>
 
             {companies.length < 3 && (
               <Button onClick={openDialog} className="gap-2">

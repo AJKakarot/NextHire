@@ -70,23 +70,48 @@ export const forgotPasswordTemplate = (resetLink: string) => {
   `;
 };
 
-export const applicationStatusUpdateTemplate = (jobTitle: string) => {
+export const applicationStatusUpdateTemplate = ({
+  name,
+  jobTitle,
+  status,
+  accountUrl,
+}: {
+  name: string;
+  jobTitle: string;
+  status: string;
+  accountUrl: string;
+}) => {
+  const hired = status === "Hired";
+  const rejected = status === "Rejected";
+  const headline = hired
+    ? "You were hired"
+    : rejected
+      ? "Application update"
+      : "Application status update";
+  const body = hired
+    ? `Congratulations${name ? `, ${name}` : ""}! The recruiter selected you for <strong>${jobTitle}</strong>.`
+    : rejected
+      ? `${name ? `${name}, y` : "Y"}our application for <strong>${jobTitle}</strong> was not selected this time.`
+      : `${name ? `${name}, y` : "Y"}our application for <strong>${jobTitle}</strong> is now <strong>${status}</strong>.`;
+
   return ` 
 <!DOCTYPE html> 
 <html lang="en"> 
 <head> 
     <meta charset="UTF-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>Application Status Update</title> 
+    <title>${headline}</title> 
     <style> 
         body { margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4; } 
         .email-wrapper { width: 100%; border-collapse: collapse; } 
         .email-container { width: 600px; border-collapse: collapse; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); border-radius: 8px; overflow: hidden; } 
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center; } 
+        .header { background: linear-gradient(135deg, #F97316 0%, #EA580C 100%); padding: 40px 30px; text-align: center; } 
         .header h1 { margin: 0; color: #ffffff; font-size: 28px; font-weight: 600; } 
         .content { padding: 40px 30px; } 
         .text { margin: 0 0 20px; color: #333333; font-size: 16px; line-height: 1.6; } 
         .text-muted { margin: 0 0 20px; color: #666666; font-size: 14px; line-height: 1.6; } 
+        .button-wrapper { margin: 30px 0; text-align: center; } 
+        .button { display: inline-block; padding: 14px 40px; background: #F97316; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; } 
         .footer { background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #e9ecef; } 
         .footer-text { margin: 0 0 10px; color: #999999; font-size: 12px; } 
         .footer-text:last-child { margin: 0; } 
@@ -99,22 +124,22 @@ export const applicationStatusUpdateTemplate = (jobTitle: string) => {
                 <table role="presentation" class="email-container"> 
                     <tr> 
                         <td class="header"> 
-                            <h1>Application Status Update</h1> 
+                            <h1>${headline}</h1> 
                         </td> 
                     </tr> 
                     <tr> 
                         <td class="content"> 
-                            <p class="text">Hi there,</p> 
-                            <p class="text"> 
-                                Your application for the position of <strong>${jobTitle}</strong> has been updated. 
-                            </p> 
-                            <p class="text-muted">You can check your application status at nextHire.</p> 
-                            <p class="text-muted">Thank you for applying!</p> 
+                            <p class="text">${body}</p> 
+                            <p class="text-muted">You can also see this status on your NextHire account under Applied Jobs.</p> 
+                            <div class="button-wrapper"> 
+                                <a href="${accountUrl}" class="button">View application</a> 
+                            </div> 
+                            <p class="text-muted">Thank you for applying with NextHire.</p> 
                         </td> 
                     </tr> 
                     <tr> 
                         <td class="footer"> 
-                            <p class="footer-text">© 2025 nextHire. All rights reserved.</p> 
+                            <p class="footer-text">© 2026 NextHire. All rights reserved.</p> 
                             <p class="footer-text">This is an automated message, please do not reply.</p> 
                         </td> 
                     </tr> 

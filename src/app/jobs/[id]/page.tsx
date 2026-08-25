@@ -13,6 +13,7 @@ import {
   IndianRupee,
   MapPin,
   Users,
+  XCircle,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -20,7 +21,7 @@ import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import PageBackground from "@/components/page-background";
-import { glassCardSm } from "@/lib/brand";
+import { flushCard, glassCardSm } from "@/lib/brand";
 import { resumeViewHref } from "@/lib/resume-url";
 
 const JobPage = () => {
@@ -31,12 +32,17 @@ const JobPage = () => {
   const [job, setJob] = useState<Job | null>(null);
 
   const [applied, setApplied] = useState(false);
+  const [myStatus, setMyStatus] = useState<Application["status"] | null>(null);
 
   useEffect(() => {
     if (applications && id) {
-      applications.forEach((item: any) => {
-        if (item.job_id.toString() === id) setApplied(true);
-      });
+      const mine = applications.find(
+        (item) => item.job_id.toString() === id.toString()
+      );
+      if (mine) {
+        setApplied(true);
+        setMyStatus(mine.status);
+      }
     }
   }, [applications, id]);
 
@@ -95,15 +101,16 @@ const JobPage = () => {
       ? jobApplications
       : jobApplications.filter((app) => app.status === filterStatus);
 
-  const [value, setValue] = useState("");
+  const [statusDrafts, setStatusDrafts] = useState<Record<number, string>>({});
 
-  const updateApplicationHandler = async (id: number) => {
-    if (value === "") return toast.error("Please give valid value");
+  const updateApplicationHandler = async (applicationId: number) => {
+    const nextStatus = statusDrafts[applicationId];
+    if (!nextStatus) return toast.error("Please give valid value");
 
     try {
       const { data } = await axios.put(
-        `/api/job/application/update/${id}`,
-        { status: value },
+        `/api/job/application/update/${applicationId}`,
+        { status: nextStatus },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -134,11 +141,11 @@ const JobPage = () => {
                 <ArrowRight size={18} /> Back to jobs
               </Button>
 
-              <Card className="mb-6 overflow-hidden border-white/[0.08] bg-white/[0.04] shadow-lg shadow-black/20">
-                <div className="border-b border-white/10 bg-gradient-to-r from-orange-500/90 to-orange-600/90 p-8">
+              <Card className={`${flushCard} mb-6 border-white/[0.08] bg-white/[0.04] shadow-lg shadow-black/20`}>
+                <div className="border-b border-white/10 bg-gradient-to-r from-orange-500/90 to-orange-600/90 px-6 py-5 sm:px-8">
                   <div className="flex items-start justify-between gap-4 flex-wrap">
                     <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-3">
+                      <div className="mb-3 flex items-center gap-3">
                         <span
                           className={`rounded-full px-3 py-1.5 text-sm font-medium ${
                             job.is_active
@@ -150,24 +157,40 @@ const JobPage = () => {
                         </span>
                       </div>
 
-                      <h1 className="mb-4 text-3xl font-bold text-white md:text-4xl">
+                      <h1 className="mb-2 text-3xl font-bold text-white md:text-4xl">
                         {job.title}
                       </h1>
-                      <div className="mb-2 flex items-center gap-2 text-base text-white/80">
-                        <Building2 size={18} />
-                        <span>{job.company_name}</span>
-                      </div>
+                      {job.company_name ? (
+                        <div className="flex items-center gap-2 text-base text-white/80">
+                          <Building2 size={18} />
+                          <span>{job.company_name}</span>
+                        </div>
+                      ) : null}
                     </div>
 
                     {user && user.role === "jobseeker" && (
                       <div className="shrink-0">
                         {applied ? (
-                          <>
-                            <div className="flex items-center gap-2 rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-6 py-3 font-medium text-emerald-300">
+                          <div
+                            className={`flex items-center gap-2 rounded-xl border px-6 py-3 font-medium ${
+                              myStatus === "Hired"
+                                ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-300"
+                                : myStatus === "Rejected"
+                                  ? "border-rose-500/25 bg-rose-500/10 text-rose-300"
+                                  : "border-emerald-500/25 bg-emerald-500/10 text-emerald-300"
+                            }`}
+                          >
+                            {myStatus === "Rejected" ? (
+                              <XCircle size={20} />
+                            ) : (
                               <CheckCircle2 size={20} />
-                              Already Applied
-                            </div>
-                          </>
+                            )}
+                            {myStatus === "Hired"
+                              ? "You were hired"
+                              : myStatus === "Rejected"
+                                ? "Not selected"
+                                : "Already Applied"}
+                          </div>
                         ) : (
                           <>
                             {job.is_active && (
@@ -224,10 +247,37 @@ const JobPage = () => {
                         <p className="text-xs opacity-70 font-medium mb-1">
                           Openings
                         </p>
-                        <p className="font-semibold">{job.openings} postions</p>
+                        <p className="font-semibold">
+                          {Math.round(Number(job.openings || 0))}{" "}
+                          {Math.round(Number(job.openings || 0)) === 1
+                            ? "position"
+                            : "positions"}
+                        </p>
                       </div>
                     </div>
                   </div>
+
+                  {applied && myStatus && myStatus !== "Submitted" && (
+                    <div
+                      className={`${glassCardSm} mb-8 p-4 ${
+                        myStatus === "Hired"
+                          ? "border-emerald-500/30"
+                          : "border-rose-500/30"
+                      }`}
+                    >
+                      <p
+                        className={`text-sm font-medium ${
+                          myStatus === "Hired"
+                            ? "text-emerald-300"
+                            : "text-rose-300"
+                        }`}
+                      >
+                        {myStatus === "Hired"
+                          ? "The recruiter hired you for this role. Check your email for the update."
+                          : "The recruiter did not select you for this role."}
+                      </p>
+                    </div>
+                  )}
 
                   {/* job descripiton */}
                   <div className="space-y-4">
@@ -326,8 +376,13 @@ const JobPage = () => {
                     {/* update Status */}
                     <div className="flex gap-2 pt-3 border-t">
                       <select
-                        value={value}
-                        onChange={(e) => setValue(e.target.value)}
+                        value={statusDrafts[e.application_id] || ""}
+                        onChange={(event) =>
+                          setStatusDrafts((prev) => ({
+                            ...prev,
+                            [e.application_id]: event.target.value,
+                          }))
+                        }
                         className="flex-1 p-2 border-2 border-gray-300 rounded-md bg-background"
                       >
                         <option value="">Update status</option>

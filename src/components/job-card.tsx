@@ -1,7 +1,7 @@
 "use client";
 import { useAppData } from "@/context/AppContext";
 import { Job } from "@/type";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import {
   ArrowRight,
@@ -20,15 +20,9 @@ interface JobCardProps {
 
 const JobCard: React.FC<JobCardProps> = ({ job }) => {
   const { user, btnLoading, applyJob, applications } = useAppData();
-  const [applied, setApplied] = useState(false);
-
-  useEffect(() => {
-    if (applications && job.job_id) {
-      applications.forEach((item: any) => {
-        if (item.job_id === job.job_id) setApplied(true);
-      });
-    }
-  }, [applications, job.job_id]);
+  const myApplication = applications?.find((item) => item.job_id === job.job_id);
+  const appliedStatus = myApplication?.status;
+  const applied = Boolean(myApplication);
 
   return (
     <Card className="group w-full max-w-none border-white/[0.08] bg-white/[0.04] transition-all duration-300 hover:-translate-y-1 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/10">
@@ -83,9 +77,21 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
           {user && user.role === "jobseeker" && (
             <>
               {applied ? (
-                <div className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-3 py-2 text-sm font-medium text-emerald-300">
+                <div
+                  className={`flex flex-1 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium ${
+                    appliedStatus === "Hired"
+                      ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-300"
+                      : appliedStatus === "Rejected"
+                        ? "border-rose-500/25 bg-rose-500/10 text-rose-300"
+                        : "border-emerald-500/25 bg-emerald-500/10 text-emerald-300"
+                  }`}
+                >
                   <CheckCircle size={15} />
-                  Applied
+                  {appliedStatus === "Hired"
+                    ? "Hired"
+                    : appliedStatus === "Rejected"
+                      ? "Rejected"
+                      : "Applied"}
                 </div>
               ) : (
                 job.is_active !== false && (

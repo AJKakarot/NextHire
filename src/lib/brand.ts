@@ -7,7 +7,10 @@ export const glassCard =
   "rounded-2xl border border-line bg-elevated backdrop-blur-md";
 
 export const glassCardAccount =
-  "overflow-hidden rounded-2xl border border-line bg-elevated shadow-lg shadow-black/20 backdrop-blur-sm";
+  "gap-0 overflow-hidden rounded-2xl border border-line bg-elevated py-0 shadow-lg shadow-black/20 backdrop-blur-sm";
+
+export const flushCard =
+  "gap-0 overflow-hidden py-0";
 
 export const glassCardSm =
   "rounded-xl border border-line bg-elevated backdrop-blur-sm";

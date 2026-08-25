@@ -1,11 +1,13 @@
 import { requireRecruiter } from "@/lib/server/auth";
 import { sql } from "@/lib/server/db";
 import { ApiError } from "@/lib/server/errors";
-import { handleApiError, json, readJson } from "@/lib/server/http";
+import { appUrl, handleApiError, json, readJson } from "@/lib/server/http";
 import { sendMail } from "@/lib/server/mail";
 import { applicationStatusUpdateTemplate } from "@/lib/server/templates";
 
 export const runtime = "nodejs";
+
+const STATUSES = ["Submitted", "Rejected", "Hired"] as const;
 
 export async function PUT(
   request: Request,
@@ -15,6 +17,10 @@ export async function PUT(
     const user = await requireRecruiter(request);
     const { id } = await params;
     const { status } = await readJson<{ status?: string }>(request);
+
+    if (!status || !STATUSES.includes(status as (typeof STATUSES)[number])) {
+      throw new ApiError(400, "Please give a valid status");
+    }
 
     const [application] =
       await sql`SELECT * FROM applications WHERE application_id = ${id}`;
@@ -37,16 +43,37 @@ export async function PUT(
     const [updatedApplication] =
       await sql`UPDATE applications SET status = ${status} WHERE application_id = ${id} RETURNING *`;
 
-    sendMail({
-      to: application.applicant_email,
-      subject: "Application Update - Job portal",
-      html: applicationStatusUpdateTemplate(job.title),
-    }).catch((error) => {
-      console.error("Failed to send mail", error);
-    });
+    const [applicant] =
+      await sql`SELECT name, email FROM users WHERE user_id = ${application.applicant_id}`;
+
+    const to = application.applicant_email || applicant?.email;
+    const subject =
+      status === "Hired"
+        ? `You were hired for ${job.title}`
+        : status === "Rejected"
+          ? `Update on your ${job.title} application`
+          : `Application update — ${job.title}`;
+
+    if (to) {
+      sendMail({
+        to,
+        subject,
+        html: applicationStatusUpdateTemplate({
+          name: applicant?.name || "",
+          jobTitle: job.title,
+          status,
+          accountUrl: `${appUrl(request)}/account`,
+        }),
+      }).catch((error) => {
+        console.error("Failed to send mail", error);
+      });
+    }
 
     return json({
-      message: "Application updated",
+      message:
+        status === "Hired"
+          ? "Applicant hired. They will get an email."
+          : "Application updated. The applicant will get an email.",
       job,
       updatedApplication,
     });

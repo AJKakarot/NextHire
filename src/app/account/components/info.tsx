@@ -89,7 +89,7 @@ const Info: React.FC<AccontProps> = ({ user, isYourAccount }) => {
   const router = useRouter();
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
+    <div className="mb-6">
       <Card className={glassCardAccount}>
         <div className="relative h-32 bg-gradient-to-r from-orange-500/25 via-orange-500/10 to-transparent">
           <div className="absolute -bottom-16 left-8">

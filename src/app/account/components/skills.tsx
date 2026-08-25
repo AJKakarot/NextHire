@@ -36,27 +36,29 @@ const Skills: React.FC<AccontProps> = ({ user, isYourAccount }) => {
     }
   };
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6">
-      <Card className="shadow-lg border-2 overflow-hidden">
-        <div className="bg-blue-500 p-6 border-b">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+    <div className="mb-6">
+      <Card className="gap-0 overflow-hidden border-2 py-0 shadow-lg">
+        <div className="border-b bg-blue-500 px-6 py-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900">
               <Award size={20} className="text-blue-600" />
             </div>
-            <CardTitle className="text-2xl text-white">
-              {isYourAccount ? "Your Skills" : "User Skills"}
-            </CardTitle>
-            {isYourAccount && (
-              <CardDescription className="text-sm mt-1 text-white">
-                Showcase your expertise and abilities
-              </CardDescription>
-            )}
+            <div>
+              <CardTitle className="text-2xl text-white">
+                {isYourAccount ? "Your Skills" : "User Skills"}
+              </CardTitle>
+              {isYourAccount && (
+                <CardDescription className="mt-1 text-sm text-white/80">
+                  Showcase your expertise and abilities
+                </CardDescription>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Add Skills Input */}
         {isYourAccount && (
-          <div className="flex gap-3 flex-col sm:flex-row">
+          <div className="flex flex-col gap-3 px-6 pt-6 sm:flex-row">
             <div className="relative flex-1">
               <Sparkle
                 size={18}

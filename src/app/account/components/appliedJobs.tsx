@@ -23,39 +23,44 @@ const AppliedJobs: React.FC<AppliedJobsProps> = ({ applications }) => {
       case "hired":
         return {
           icon: CheckCircle2,
-          color: "text-green-600 dark:bg-green-900/30",
-          bg: "bg-green-100 dark:bg-green-900/30",
-          border: "border-green-200 dark:border-green-800",
+          color: "text-emerald-300",
+          bg: "bg-emerald-500/10",
+          border: "border-emerald-500/30",
+          message: "The recruiter hired you for this role.",
         };
       case "rejected":
         return {
           icon: XCircle,
-          color: "text-red-600 dark:bg-red-900/30",
-          bg: "bg-red-100 dark:bg-red-900/30",
-          border: "border-red-200 dark:border-red-800",
+          color: "text-rose-300",
+          bg: "bg-rose-500/10",
+          border: "border-rose-500/30",
+          message: "You were not selected for this role.",
         };
       default:
         return {
           icon: Clock,
-          color: "text-yellow-600 dark:bg-yellow-900/30",
-          bg: "bg-yellow-100 dark:bg-yellow-900/30",
-          border: "border-yellow-200 dark:border-yellow-800",
+          color: "text-amber-300",
+          bg: "bg-amber-500/10",
+          border: "border-amber-500/30",
+          message: "Your application is with the recruiter.",
         };
     }
   };
   return (
-    <div className="max-w-6xl mx-auto px-4 py-6">
+    <div className="mb-6">
       <Card className={glassCardAccount}>
-        <div className="bg-orange-500/90 text-white p-6 border-b">
+        <div className="border-b bg-orange-500/90 px-6 py-4 text-white">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
-              <Briefcase size={20} className="text-orange-400" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/15">
+              <Briefcase size={20} className="text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold">Your Applied Jobs</h1>
+              <p className="text-sm text-white/80">
+                {applications.length} applications submitted
+              </p>
             </div>
           </div>
-          <h1 className="text-2xl font-bold">Your Applied Jobs</h1>
-          <p className="text-sm font-bold">
-            {applications.length} applications submitted
-          </p>
         </div>
 
         <div className="p-6">
@@ -72,34 +77,35 @@ const AppliedJobs: React.FC<AppliedJobsProps> = ({ applications }) => {
                   >
                     <div className="flex items-start justify-between gap-4 flex-wrap">
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-xl font-semibold mb-3">
+                        <h3 className="mb-3 text-xl font-semibold">
                           {a.job_title}
                         </h3>
 
-                        <div className="flex flex-wrap gap-4 items-center">
-                          <div className="flex items-center gap-2 text-sm">
-                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600">
-                              <IndianRupee size={14} />
-                              <span className="font-medium">
-                                {Number(a.job_salary || 0).toLocaleString("en-IN")} P.A
-                              </span>
-                            </div>
+                        <div className="flex flex-wrap items-center gap-3">
+                          <div className="flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1.5 text-sm text-emerald-300">
+                            <IndianRupee size={14} />
+                            <span className="font-medium">
+                              {Number(a.job_salary || 0).toLocaleString("en-IN")} P.A
+                            </span>
                           </div>
 
                           <div
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border ${statusConfig.bg} ${statusConfig.border}`}
+                            className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 ${statusConfig.bg} ${statusConfig.border}`}
                           >
                             <StatusIcon
                               size={14}
                               className={statusConfig.color}
                             />
                             <span
-                              className={`font-medium text-sm ${statusConfig.color}`}
+                              className={`text-sm font-medium ${statusConfig.color}`}
                             >
                               {a.status}
                             </span>
                           </div>
                         </div>
+                        <p className={`mt-3 text-sm ${statusConfig.color}`}>
+                          {statusConfig.message}
+                        </p>
                       </div>
 
                       <Link
