@@ -31,7 +31,7 @@ const LoginPage = () => {
     setBtnLoading(true);
     try {
       const { data } = await axios.post(`/api/auth/login`, {
-        email,
+        email: email.trim().toLowerCase(),
         password,
       });
 
@@ -39,7 +39,8 @@ const LoginPage = () => {
 
       Cookies.set("token", data.token, {
         expires: 15,
-        secure: false,
+        secure: window.location.protocol === "https:",
+        sameSite: "lax",
         path: "/",
       });
       setUser(data.userObject);

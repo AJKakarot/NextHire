@@ -8,7 +8,7 @@ import {
   Briefcase,
   Building2,
   CheckCircle,
-  DollarSign,
+  IndianRupee,
   MapPin,
 } from "lucide-react";
 import Link from "next/link";
@@ -59,9 +59,11 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
             <MapPin size={14} />
             <span className="font-medium">{job.location}</span>
           </div>
-          <div className="flex items-center gap-2 text-base font-semibold text-emerald-400/90">
-            <DollarSign size={18} />
-            <span>₹ {job.salary} P.A</span>
+          <div className="flex items-center gap-2 text-base font-semibold text-ok">
+            <IndianRupee size={18} />
+            <span>
+              {Number(job.salary || 0).toLocaleString("en-IN")} P.A
+            </span>
           </div>
         </div>
       </CardHeader>

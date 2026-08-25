@@ -10,7 +10,7 @@ import {
   Briefcase,
   Building2,
   CheckCircle2,
-  DollarSign,
+  IndianRupee,
   MapPin,
   Users,
 } from "lucide-react";
@@ -204,13 +204,15 @@ const JobPage = () => {
 
                     <div className={`${glassCardSm} flex items-center gap-3 p-4`}>
                       <div className="h-12 w-12 rounded-full bg-orange-500/10 flex items-center justify-center shrink-0">
-                        <DollarSign size={20} className="text-orange-400" />
+                        <IndianRupee size={20} className="text-orange-400" />
                       </div>
                       <div>
                         <p className="text-xs opacity-70 font-medium mb-1">
                           Salary
                         </p>
-                        <p className="font-semibold">₹{job.salary} P.A</p>
+                        <p className="font-semibold">
+                          ₹{Number(job.salary || 0).toLocaleString("en-IN")} P.A
+                        </p>
                       </div>
                     </div>
 

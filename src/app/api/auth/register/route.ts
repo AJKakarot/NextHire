@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { ApiError } from "@/lib/server/errors";
 import { sql } from "@/lib/server/db";
-import { signAuthToken } from "@/lib/server/auth";
+import { normalizeEmail, signAuthToken } from "@/lib/server/auth";
 import { fileToDataUri, handleApiError, json, parseForm } from "@/lib/server/http";
 import { uploadToCloudinary } from "@/lib/server/upload";
 
@@ -11,13 +11,14 @@ export async function POST(request: Request) {
   try {
     const { fields, file } = await parseForm(request);
     const { name, email, password, phoneNumber, role, bio } = fields;
+    const normalizedEmail = normalizeEmail(email);
 
-    if (!name || !email || !password || !phoneNumber || !role) {
+    if (!name || !normalizedEmail || !password || !phoneNumber || !role) {
       throw new ApiError(400, "Please fill all details");
     }
 
     const existingUsers =
-      await sql`SELECT user_id FROM users WHERE email = ${email}`;
+      await sql`SELECT user_id FROM users WHERE LOWER(email) = ${normalizedEmail}`;
 
     if (existingUsers.length > 0) {
       throw new ApiError(409, "User with this email already exists");
@@ -29,7 +30,7 @@ export async function POST(request: Request) {
     if (role === "recruiter") {
       const [user] =
         await sql`INSERT INTO users (name, email, password, phone_number, role) VALUES 
-                 (${name}, ${email}, ${hashPassword}, ${phoneNumber}, ${role}) RETURNING user_id, name, email, phone_number, role, created_at`;
+                 (${name}, ${normalizedEmail}, ${hashPassword}, ${phoneNumber}, ${role}) RETURNING user_id, name, email, phone_number, role, created_at`;
       registeredUser = user;
     } else if (role === "jobseeker") {
       if (!file) {
@@ -41,7 +42,7 @@ export async function POST(request: Request) {
 
       const [user] =
         await sql`INSERT INTO users (name, email, password, phone_number, role, bio, resume, resume_public_id) VALUES 
-                 (${name}, ${email}, ${hashPassword}, ${phoneNumber}, ${role}, ${bio || null}, ${data.url}, ${data.public_id}) RETURNING user_id, name, email, phone_number, role, bio, resume, created_at`;
+                 (${name}, ${normalizedEmail}, ${hashPassword}, ${phoneNumber}, ${role}, ${bio || null}, ${data.url}, ${data.public_id}) RETURNING user_id, name, email, phone_number, role, bio, resume, created_at`;
       registeredUser = user;
     } else {
       throw new ApiError(400, "Invalid role");

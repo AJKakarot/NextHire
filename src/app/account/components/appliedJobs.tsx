@@ -6,7 +6,7 @@ import {
   Briefcase,
   CheckCircle2,
   Clock,
-  DollarSign,
+  IndianRupee,
   Eye,
   XCircle,
 } from "lucide-react";
@@ -79,9 +79,9 @@ const AppliedJobs: React.FC<AppliedJobsProps> = ({ applications }) => {
                         <div className="flex flex-wrap gap-4 items-center">
                           <div className="flex items-center gap-2 text-sm">
                             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600">
-                              <DollarSign size={14} />
+                              <IndianRupee size={14} />
                               <span className="font-medium">
-                                ₹ {a.job_salary}
+                                {Number(a.job_salary || 0).toLocaleString("en-IN")} P.A
                               </span>
                             </div>
                           </div>

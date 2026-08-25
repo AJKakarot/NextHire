@@ -2,6 +2,10 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { sql } from "./db";
 import { ApiError } from "./errors";
 
+export function normalizeEmail(email?: string | null) {
+  return email?.trim().toLowerCase() || "";
+}
+
 export type AuthUser = {
   user_id: number;
   name: string;

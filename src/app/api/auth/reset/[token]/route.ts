@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { ApiError } from "@/lib/server/errors";
 import { sql } from "@/lib/server/db";
-import { verifyToken } from "@/lib/server/auth";
+import { normalizeEmail, verifyToken } from "@/lib/server/auth";
 import { handleApiError, json, readJson } from "@/lib/server/http";
 import { redisClient } from "@/lib/server/redis";
 
@@ -26,14 +26,14 @@ export async function POST(
       throw new ApiError(400, "Invalid token type");
     }
 
-    const email = decoded.email;
+    const email = normalizeEmail(decoded.email);
     const storedToken = await redisClient.get(`forgot:${email}`);
 
     if (!storedToken || storedToken !== token) {
       throw new ApiError(400, "token has been expired");
     }
 
-    const users = await sql`SELECT user_id FROM users WHERE email = ${email}`;
+    const users = await sql`SELECT user_id FROM users WHERE LOWER(email) = ${email}`;
 
     if (users.length === 0) {
       throw new ApiError(404, "User not found");

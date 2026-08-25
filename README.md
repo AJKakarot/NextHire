@@ -1,174 +1,188 @@
 # NextHire
 
-A full-stack **job portal** where job seekers discover roles, manage applications, and get AI-powered career guidance—and recruiters post jobs and manage candidates. Built as a **single Next.js** app: UI and APIs live together.
+Analyze a resume with AI, get an ATS score, then find and apply to jobs — or hire as a recruiter. One **Next.js** app. UI and APIs share the same process.
+
+**Live:** [nexthires.app](https://nexthires.app) · **Repo:** [AJKakarot/next-hires](https://github.com/AJKakarot/next-hires)
 
 ---
 
-## Features
+## What it does
 
-### For Job Seekers
-- **Browse jobs** — Search and filter active job listings
-- **Company profiles** — View company details and open positions
-- **Apply to jobs** — Submit applications and track status
-- **Resume analyzer** — Get ATS-style scores and improvement suggestions
-- **AI career guide** — Personalized career path and skill recommendations (Groq or OpenAI)
-- **Account & profile** — Update profile, resume, skills, and subscription
+**Job seekers**
+- Drop a PDF on the home pipeline and get an ATS score, breakdown, strengths, and fixes
+- Optional **Gemini/Groq polish** against a target title and job description
+- Career guide from your skills (roles, what to learn, 30/60/90-day plan)
+- Browse jobs, apply in one click, track applications
 
-### For Recruiters
-- **Post jobs** — Create and update job listings
-- **Manage companies** — Create companies and attach jobs
-- **Applications** — View and update application status for each job
+**Recruiters**
+- Create companies and post roles
+- Review applicants and update status
 
-### Platform
-- **Auth** — Register, login, forgot/reset password with email
-- **Payments** — Subscription flows via Razorpay
-- **File uploads** — Resume and profile images (Cloudinary)
-- **Email** — Notifications (Resend or Nodemailer)
-- **Dark/Light theme** — System-aware theme toggle
+**Platform**
+- Register / login / forgot-reset (JWT + email)
+- Cloudinary uploads for resumes and photos
+- Razorpay subscriptions
+- Resend email, or Gmail SMTP if no Resend key
 
 ---
 
-## Tech Stack
+## Stack
 
-| Layer | Technologies |
-|-------|--------------|
-| **App** | Next.js 16, React 19, TypeScript, Tailwind CSS, Radix UI |
-| **API** | Next.js Route Handlers under `/api/*` |
-| **Auth** | JWT, bcryptjs, Redis (reset tokens) |
-| **Data** | Neon (PostgreSQL) |
-| **Payments** | Razorpay |
-| **Storage** | Cloudinary |
-| **AI** | Groq or OpenAI |
-| **Email** | Resend or Gmail SMTP |
+| Piece | Choice |
+| --- | --- |
+| App | Next.js 16, React 19, TypeScript, Tailwind CSS |
+| API | Route Handlers under `/api/*` |
+| Auth | JWT, bcrypt, Upstash Redis (reset tokens) |
+| Database | Neon Postgres (tables created on first boot) |
+| AI | Groq (`openai/gpt-oss-20b`) with OpenAI fallback |
+| Files | Cloudinary |
+| Pay | Razorpay |
+| Mail | Resend or SMTP |
 
 ---
 
 ## Architecture
 
-One Next.js process serves the UI and all APIs. There are no separate Express services, Kafka, or cross-service HTTP hops. Uploads, AI, mail, and payments are called in-process.
+One Node process. No Express microservices, no Kafka, no inter-service HTTP.
 
 ```mermaid
 flowchart TB
-    classDef client fill:#0c4a6e,stroke:#38bdf8,stroke-width:2px,color:#e0f2fe
-    classDef app fill:#431407,stroke:#f97316,stroke-width:2px,color:#ffedd5
-    classDef data fill:#14532d,stroke:#4ade80,stroke-width:2px,color:#dcfce7
-    classDef external fill:#3f3f46,stroke:#a1a1aa,stroke-width:2px,color:#fafafa
+    classDef client fill:#18181B,stroke:#F97316,stroke-width:2px,color:#FAFAFA
+    classDef app fill:#09090B,stroke:#FB923C,stroke-width:2px,color:#FAFAFA
+    classDef data fill:#18181B,stroke:#22C55E,stroke-width:2px,color:#FAFAFA
+    classDef ext fill:#18181B,stroke:#60A5FA,stroke-width:2px,color:#FAFAFA
 
-    USERS(["Job Seeker / Recruiter"]):::client
+    USERS(["Job seeker / Recruiter"]):::client
 
-    subgraph APP["Next.js monolith :3000"]
-        UI["App Router pages"]
-        API["/api/auth · /api/user · /api/job · /api/payment · /api/utils"]
+    subgraph APP["Next.js :3000"]
+        UI["Pages"]
+        API["/api/auth · user · job · payment · utils"]
         UI --> API
     end
 
-    PG[("PostgreSQL / Neon")]:::data
+    PG[("Neon Postgres")]:::data
     REDIS[("Upstash Redis")]:::data
-    CLOUD["Cloudinary"]:::external
-    GEMINI["Groq / OpenAI"]:::external
-    RAZOR["Razorpay"]:::external
-    SMTP["Resend / SMTP"]:::external
+    CLOUD["Cloudinary"]:::ext
+    LLM["Groq / OpenAI"]:::ext
+    RAZOR["Razorpay"]:::ext
+    MAIL["Resend / SMTP"]:::ext
 
     USERS --> UI
     API --> PG
     API --> REDIS
     API --> CLOUD
-    API --> GEMINI
+    API --> LLM
     API --> RAZOR
-    API --> SMTP
+    API --> MAIL
 
     class UI,API,APP app
 ```
 
-### API map
-
-| Prefix | Purpose |
-|--------|---------|
-| `/api/auth` | Register, login, forgot, reset |
-| `/api/user` | Profile, skills, resume, apply, applications |
-| `/api/job` | Companies, jobs, recruiter application review |
-| `/api/payment` | Razorpay checkout and verify |
-| `/api/utils` | Upload, resume proxy, career guide, resume analyser |
+| Prefix | Routes |
+| --- | --- |
+| `/api/auth` | register, login, forgot, reset |
+| `/api/user` | me, profile, skills, resume, apply, applications |
+| `/api/job` | companies, jobs, recruiter review |
+| `/api/payment` | Razorpay order + verify |
+| `/api/utils` | upload, resume proxy, career guide, resume analyser |
 
 ---
 
-## Project Structure
+## Run locally
 
-```
-next-hire-platform/
-├── src/
-│   ├── app/                 # Pages + Route Handlers
-│   │   ├── api/             # Auth, user, job, payment, utils
-│   │   ├── (auth)/          # login, register, forgot, reset
-│   │   ├── account/
-│   │   ├── jobs/
-│   │   └── ...
-│   ├── components/
-│   ├── context/             # AppContext (session + profile actions)
-│   └── lib/server/          # DB, JWT, mail, Cloudinary, Groq/OpenAI, Razorpay
-├── public/
-├── package.json
-└── .env.example
-```
-
----
-
-## Prerequisites
-
-- **Node.js** 18+
-- **Neon** account (PostgreSQL)
-- **Cloudinary** account
-- **Razorpay** account
-- **Groq** or **OpenAI** API key
-- **Upstash Redis** (password reset)
-- **Resend** or Gmail SMTP
-
----
-
-## Environment Variables
-
-Copy `.env.example` to `.env.local` and fill values:
-
-```env
-APP_URL=http://localhost:3000
-DB_URL=
-JWT_SEC=
-UPSTASH_REDIS_REST_URL=
-UPSTASH_REDIS_REST_TOKEN=
-RESEND_API_KEY=
-SMTP_USER=
-SMTP_PASS=
-CLOUD_NAME=
-API_KEY=
-API_SECRET=
-GROQ_API_KEY=
-Razorpay_Key=
-Razorpay_Secret=
-NEXT_PUBLIC_RAZORPAY_KEY=
-```
-
----
-
-## Getting Started
+Need Node 18+, plus accounts for Neon, Cloudinary, Groq (or OpenAI), Upstash, and mail.
 
 ```bash
+git clone https://github.com/AJKakarot/next-hires.git
+cd next-hires
+cp .env.example .env.local
 npm install
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
 
-Tables are created automatically on first server start.
-
-### Production
-
 ```bash
-npm run build
-npm start
+npm run build && npm start   # production
+npm run lint
+```
+
+---
+
+## Environment
+
+Copy `.env.example` → `.env.local`. Never commit `.env.local`.
+
+```env
+# App
+APP_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Postgres (Neon)
+DB_URL=
+
+# Auth
+JWT_SEC=
+
+# Redis — password reset
+UPSTASH_REDIS_REST_URL=
+UPSTASH_REDIS_REST_TOKEN=
+
+# Email — Resend wins if RESEND_API_KEY is set
+RESEND_API_KEY=
+RESEND_FROM=NextHire <onboarding@resend.dev>
+SMTP_USER=
+SMTP_PASS=
+
+# Cloudinary
+CLOUD_NAME=
+API_KEY=
+API_SECRET=
+
+# AI — Groq first, else OpenAI
+GROQ_API_KEY=
+GROQ_MODEL=openai/gpt-oss-20b
+# OPENAI_API_KEY=
+# OPENAI_MODEL=gpt-4o-mini
+
+# Razorpay
+Razorpay_Key=
+Razorpay_Secret=
+NEXT_PUBLIC_RAZORPAY_KEY=
+```
+
+On Vercel, add the same keys. Set `APP_URL` / `NEXT_PUBLIC_APP_URL` to the live origin (`https://nexthires.app` or `https://www.nexthires.app`).
+
+---
+
+## Deploy
+
+**Vercel** is the intended host (Hobby is fine).
+
+1. Import [AJKakarot/next-hires](https://github.com/AJKakarot/next-hires)
+2. Paste env vars from `.env.example`
+3. Deploy
+
+Custom domain: apex `A` → Vercel, `www` `CNAME` → `cname.vercel-dns.com`. Then pick one as primary and redirect the other.
+
+`render.yaml` is also in the repo if you prefer Render (one web service, `npm run build` / `npm start`).
+
+---
+
+## Layout
+
+```
+src/
+  app/                 pages + /api route handlers
+  components/          landing, analyzer, chrome, UI
+  context/             session + profile actions
+  lib/server/          db, jwt, mail, upload, llm, razorpay
+public/
+.env.example
 ```
 
 ---
 
 ## License
 
-ISC
+ISC · Built by [Ajeet Gupta](https://ajeetgupta.com)
