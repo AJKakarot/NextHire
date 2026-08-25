@@ -10,6 +10,7 @@ import {
   Briefcase,
   Building2,
   CheckCircle2,
+  ExternalLink,
   IndianRupee,
   MapPin,
   Users,
@@ -22,6 +23,7 @@ import toast from "react-hot-toast";
 import Link from "next/link";
 import PageBackground from "@/components/page-background";
 import { flushCard, glassCardSm } from "@/lib/brand";
+import { isExternalJob, sourceLabel } from "@/lib/jobs";
 import { resumeViewHref } from "@/lib/resume-url";
 
 const JobPage = () => {
@@ -89,7 +91,7 @@ const JobPage = () => {
   }
 
   useEffect(() => {
-    if (user && job && user.user_id === job.posted_by_recuriter_id) {
+    if (user && job && !external && user.user_id === job.posted_by_recuriter_id) {
       fetchJobApplications();
     }
   }, [user, job]);
@@ -102,6 +104,7 @@ const JobPage = () => {
       : jobApplications.filter((app) => app.status === filterStatus);
 
   const [statusDrafts, setStatusDrafts] = useState<Record<number, string>>({});
+  const external = Boolean(job && isExternalJob(job));
 
   const updateApplicationHandler = async (applicationId: number) => {
     const nextStatus = statusDrafts[applicationId];
@@ -145,7 +148,7 @@ const JobPage = () => {
                 <div className="border-b border-white/10 bg-gradient-to-r from-orange-500/90 to-orange-600/90 px-6 py-5 sm:px-8">
                   <div className="flex items-start justify-between gap-4 flex-wrap">
                     <div className="flex-1">
-                      <div className="mb-3 flex items-center gap-3">
+                      <div className="mb-3 flex flex-wrap items-center gap-3">
                         <span
                           className={`rounded-full px-3 py-1.5 text-sm font-medium ${
                             job.is_active
@@ -155,6 +158,11 @@ const JobPage = () => {
                         >
                           {job.is_active ? "Open" : "Closed"}
                         </span>
+                        {external && (
+                          <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-sm font-medium text-white">
+                            Via {sourceLabel(job.source)}
+                          </span>
+                        )}
                       </div>
 
                       <h1 className="mb-2 text-3xl font-bold text-white md:text-4xl">
@@ -168,44 +176,61 @@ const JobPage = () => {
                       ) : null}
                     </div>
 
-                    {user && user.role === "jobseeker" && (
-                      <div className="shrink-0">
-                        {applied ? (
-                          <div
-                            className={`flex items-center gap-2 rounded-xl border px-6 py-3 font-medium ${
-                              myStatus === "Hired"
-                                ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-300"
+                    {external ? (
+                      job.apply_url && (
+                        <a
+                          href={job.apply_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="shrink-0"
+                        >
+                          <Button className="h-12 gap-2 px-8">
+                            <ExternalLink size={18} />
+                            Apply on {sourceLabel(job.source)}
+                          </Button>
+                        </a>
+                      )
+                    ) : (
+                      user &&
+                      user.role === "jobseeker" && (
+                        <div className="shrink-0">
+                          {applied ? (
+                            <div
+                              className={`flex items-center gap-2 rounded-xl border px-6 py-3 font-medium ${
+                                myStatus === "Hired"
+                                  ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-300"
+                                  : myStatus === "Rejected"
+                                    ? "border-rose-500/25 bg-rose-500/10 text-rose-300"
+                                    : "border-emerald-500/25 bg-emerald-500/10 text-emerald-300"
+                              }`}
+                            >
+                              {myStatus === "Rejected" ? (
+                                <XCircle size={20} />
+                              ) : (
+                                <CheckCircle2 size={20} />
+                              )}
+                              {myStatus === "Hired"
+                                ? "You were hired"
                                 : myStatus === "Rejected"
-                                  ? "border-rose-500/25 bg-rose-500/10 text-rose-300"
-                                  : "border-emerald-500/25 bg-emerald-500/10 text-emerald-300"
-                            }`}
-                          >
-                            {myStatus === "Rejected" ? (
-                              <XCircle size={20} />
-                            ) : (
-                              <CheckCircle2 size={20} />
-                            )}
-                            {myStatus === "Hired"
-                              ? "You were hired"
-                              : myStatus === "Rejected"
-                                ? "Not selected"
-                                : "Already Applied"}
-                          </div>
-                        ) : (
-                          <>
-                            {job.is_active && (
+                                  ? "Not selected"
+                                  : "Already Applied"}
+                            </div>
+                          ) : (
+                            job.is_active && (
                               <Button
-                                onClick={() => applyJobHandler(job.job_id)}
+                                onClick={() =>
+                                  applyJobHandler(Number(job.job_id))
+                                }
                                 disabled={btnLoading}
-                                className="gap-2 h-12 px-8"
+                                className="h-12 gap-2 px-8"
                               >
                                 <Briefcase size={18} />{" "}
                                 {btnLoading ? "Applying..." : "Easy Apply"}
                               </Button>
-                            )}
-                          </>
-                        )}
-                      </div>
+                            )
+                          )}
+                        </div>
+                      )
                     )}
                   </div>
                 </div>
@@ -234,24 +259,33 @@ const JobPage = () => {
                           Salary
                         </p>
                         <p className="font-semibold">
-                          ₹{Number(job.salary || 0).toLocaleString("en-IN")} P.A
+                          {external
+                            ? job.salary_text || "Not disclosed"
+                            : `₹${Number(job.salary || 0).toLocaleString("en-IN")} P.A`}
                         </p>
                       </div>
                     </div>
 
                     <div className={`${glassCardSm} flex items-center gap-3 p-4`}>
                       <div className="h-12 w-12 rounded-full bg-orange-500/10 flex items-center justify-center shrink-0">
-                        <Users size={20} className="text-orange-400" />
+                        {external ? (
+                          <Briefcase size={20} className="text-orange-400" />
+                        ) : (
+                          <Users size={20} className="text-orange-400" />
+                        )}
                       </div>
                       <div>
                         <p className="text-xs opacity-70 font-medium mb-1">
-                          Openings
+                          {external ? "Type" : "Openings"}
                         </p>
                         <p className="font-semibold">
-                          {Math.round(Number(job.openings || 0))}{" "}
-                          {Math.round(Number(job.openings || 0)) === 1
-                            ? "position"
-                            : "positions"}
+                          {external
+                            ? job.job_type
+                            : `${Math.round(Number(job.openings || 0))} ${
+                                Math.round(Number(job.openings || 0)) === 1
+                                  ? "position"
+                                  : "positions"
+                              }`}
                         </p>
                       </div>
                     </div>
@@ -299,7 +333,7 @@ const JobPage = () => {
         </>
       )}
 
-      {user && job && user.user_id === job.posted_by_recuriter_id && (
+      {user && job && !external && user.user_id === job.posted_by_recuriter_id && (
         <div className="relative mx-auto mb-8 mt-8 w-[90%] max-w-3xl md:w-2/3">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-2xl font-bold text-white">All Applications</h2>

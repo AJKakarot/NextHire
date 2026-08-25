@@ -1,5 +1,6 @@
 "use client";
 import { useAppData } from "@/context/AppContext";
+import { isExternalJob, sourceLabel } from "@/lib/jobs";
 import { Job } from "@/type";
 import React from "react";
 import { Card, CardContent, CardHeader } from "./ui/card";
@@ -8,6 +9,7 @@ import {
   Briefcase,
   Building2,
   CheckCircle,
+  ExternalLink,
   IndianRupee,
   MapPin,
 } from "lucide-react";
@@ -20,9 +22,17 @@ interface JobCardProps {
 
 const JobCard: React.FC<JobCardProps> = ({ job }) => {
   const { user, btnLoading, applyJob, applications } = useAppData();
-  const myApplication = applications?.find((item) => item.job_id === job.job_id);
+  const external = isExternalJob(job);
+  const myApplication = applications?.find(
+    (item) => String(item.job_id) === String(job.job_id)
+  );
   const appliedStatus = myApplication?.status;
   const applied = Boolean(myApplication);
+
+  const detailsHref = `/jobs/${job.job_id}`;
+  const logoHref = external
+    ? job.apply_url || detailsHref
+    : `/company/${job.company_id}`;
 
   return (
     <Card className="group w-full max-w-none border-white/[0.08] bg-white/[0.04] transition-all duration-300 hover:-translate-y-1 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/10">
@@ -36,13 +46,26 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
               <Building2 size={16} />
               <span>{job.company_name}</span>
             </div>
+            {external && (
+              <p className="mt-2 text-xs text-zinc-500">
+                Via {sourceLabel(job.source)}
+              </p>
+            )}
           </div>
-          <Link href={`/company/${job.company_id}`} className="shrink-0">
+          <Link
+            href={logoHref}
+            className="shrink-0"
+            target={external ? "_blank" : undefined}
+            rel={external ? "noreferrer" : undefined}
+          >
             <div className="h-14 w-14 overflow-hidden rounded-xl border border-white/10 bg-black/30 transition-transform hover:scale-105">
               <img
-                src={job.company_logo}
+                src={job.company_logo || "/user.png"}
                 alt=""
                 className="h-full w-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = "/user.png";
+                }}
               />
             </div>
           </Link>
@@ -51,20 +74,26 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
         <div className="space-y-2">
           <div className="inline-flex items-center gap-1.5 rounded-full bg-orange-500/10 px-3 py-1.5 text-sm text-orange-300">
             <MapPin size={14} />
-            <span className="font-medium">{job.location}</span>
+            <span className="font-medium">{job.location || "Remote"}</span>
           </div>
-          <div className="flex items-center gap-2 text-base font-semibold text-ok">
-            <IndianRupee size={18} />
-            <span>
-              {Number(job.salary || 0).toLocaleString("en-IN")} P.A
-            </span>
-          </div>
+          {external ? (
+            <div className="text-sm font-medium text-zinc-300">
+              {job.salary_text || "Salary not disclosed"}
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 text-base font-semibold text-ok">
+              <IndianRupee size={18} />
+              <span>
+                {Number(job.salary || 0).toLocaleString("en-IN")} P.A
+              </span>
+            </div>
+          )}
         </div>
       </CardHeader>
 
       <CardContent className="flex flex-col gap-3 border-t border-white/10 pt-4">
         <div className="flex w-full gap-2">
-          <Link href={`/jobs/${job.job_id}`} className="flex-1">
+          <Link href={detailsHref} className="flex-1">
             <Button variant="outline" className="w-full gap-2 group/btn">
               View Details
               <ArrowRight
@@ -74,38 +103,53 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
             </Button>
           </Link>
 
-          {user && user.role === "jobseeker" && (
-            <>
-              {applied ? (
-                <div
-                  className={`flex flex-1 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium ${
-                    appliedStatus === "Hired"
-                      ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-300"
-                      : appliedStatus === "Rejected"
-                        ? "border-rose-500/25 bg-rose-500/10 text-rose-300"
-                        : "border-emerald-500/25 bg-emerald-500/10 text-emerald-300"
-                  }`}
-                >
-                  <CheckCircle size={15} />
-                  {appliedStatus === "Hired"
-                    ? "Hired"
-                    : appliedStatus === "Rejected"
-                      ? "Rejected"
-                      : "Applied"}
-                </div>
-              ) : (
-                job.is_active !== false && (
-                  <Button
-                    disabled={btnLoading}
-                    onClick={() => applyJob(job.job_id)}
-                    className="flex-1 gap-2"
+          {external ? (
+            <a
+              href={job.apply_url}
+              target="_blank"
+              rel="noreferrer"
+              className="flex-1"
+            >
+              <Button className="w-full gap-2">
+                <ExternalLink size={16} />
+                Apply
+              </Button>
+            </a>
+          ) : (
+            user &&
+            user.role === "jobseeker" && (
+              <>
+                {applied ? (
+                  <div
+                    className={`flex flex-1 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium ${
+                      appliedStatus === "Hired"
+                        ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-300"
+                        : appliedStatus === "Rejected"
+                          ? "border-rose-500/25 bg-rose-500/10 text-rose-300"
+                          : "border-emerald-500/25 bg-emerald-500/10 text-emerald-300"
+                    }`}
                   >
-                    <Briefcase size={16} />
-                    Easy Apply
-                  </Button>
-                )
-              )}
-            </>
+                    <CheckCircle size={15} />
+                    {appliedStatus === "Hired"
+                      ? "Hired"
+                      : appliedStatus === "Rejected"
+                        ? "Rejected"
+                        : "Applied"}
+                  </div>
+                ) : (
+                  job.is_active !== false && (
+                    <Button
+                      disabled={btnLoading}
+                      onClick={() => applyJob(Number(job.job_id))}
+                      className="flex-1 gap-2"
+                    >
+                      <Briefcase size={16} />
+                      Easy Apply
+                    </Button>
+                  )
+                )}
+              </>
+            )
           )}
         </div>
 

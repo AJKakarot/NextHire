@@ -1,6 +1,7 @@
 import { requireRecruiter } from "@/lib/server/auth";
 import { sql } from "@/lib/server/db";
 import { ApiError } from "@/lib/server/errors";
+import { getExternalJob } from "@/lib/server/external-jobs";
 import { handleApiError, json, readJson } from "@/lib/server/http";
 
 export const runtime = "nodejs";
@@ -11,13 +12,27 @@ export async function GET(
 ) {
   try {
     const { jobId } = await params;
-    const [job] = await sql`SELECT * FROM jobs WHERE job_id = ${jobId}`;
+
+    if (jobId.startsWith("ext-")) {
+      const external = await getExternalJob(jobId);
+      if (!external) {
+        throw new ApiError(404, "Job not found");
+      }
+      return json(external);
+    }
+
+    const [job] = await sql`
+      SELECT j.*, c.name AS company_name, c.logo AS company_logo
+      FROM jobs j
+      JOIN companies c ON j.company_id = c.company_id
+      WHERE j.job_id = ${jobId}
+    `;
 
     if (!job) {
       throw new ApiError(404, "Job not found");
     }
 
-    return json(job);
+    return json({ ...job, source: "nexthire" });
   } catch (error) {
     return handleApiError(error);
   }
@@ -30,6 +45,9 @@ export async function PUT(
   try {
     const user = await requireRecruiter(request);
     const { jobId } = await params;
+    if (jobId.startsWith("ext-")) {
+      throw new ApiError(400, "External listings cannot be edited here");
+    }
     const {
       title,
       description,
@@ -91,6 +109,9 @@ export async function DELETE(
   try {
     const user = await requireRecruiter(request);
     const { jobId } = await params;
+    if (jobId.startsWith("ext-")) {
+      throw new ApiError(400, "External listings cannot be edited here");
+    }
 
     const [existingJob] =
       await sql`SELECT posted_by_recuriter_id FROM jobs WHERE job_id = ${jobId}`;

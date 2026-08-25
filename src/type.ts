@@ -98,10 +98,11 @@ export interface AccontProps {
 }
 
 export interface Job {
-  job_id: number;
+  job_id: number | string;
   title: string;
   description: string;
   salary: number | null;
+  salary_text?: string | null;
   location: string | null;
   job_type: "Full-time" | "Part-time" | "Contract" | "Internship";
   openings: number;
@@ -113,6 +114,8 @@ export interface Job {
   posted_by_recuriter_id: number;
   created_at: string;
   is_active: boolean;
+  source?: "nexthire" | "remotive" | "jobicy" | "himalayas";
+  apply_url?: string;
 }
 
 export interface Company {

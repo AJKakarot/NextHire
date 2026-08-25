@@ -14,6 +14,7 @@ import PageBackground from "@/components/page-background";
 import { glassCardSm } from "@/lib/brand";
 
 const locations: string[] = [
+  "India",
   "Delhi",
   "Mumbai",
   "Banglore",
@@ -100,6 +101,9 @@ const JobsPage = () => {
             {isRecruiter
               ? `${jobs.length} open roles in the market`
               : `${jobs.length} jobs found`}
+            {jobs.some((job) => job.source && job.source !== "nexthire")
+              ? " · includes live remote listings"
+              : ""}
           </p>
         </div>
 
@@ -181,7 +185,7 @@ const JobsPage = () => {
         ) : jobs.length > 0 ? (
           <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {jobs.map((job) => (
-              <JobCard job={job} key={job.job_id} />
+              <JobCard job={job} key={String(job.job_id)} />
             ))}
           </div>
         ) : (
@@ -195,6 +199,37 @@ const JobsPage = () => {
             </p>
           </div>
         )}
+
+        <p className="pb-8 text-center text-xs text-zinc-600">
+          Remote listings via{" "}
+          <a
+            href="https://himalayas.app"
+            target="_blank"
+            rel="noreferrer"
+            className="text-zinc-400 hover:text-orange-300"
+          >
+            Himalayas
+          </a>
+          {", "}
+          <a
+            href="https://remotive.com"
+            target="_blank"
+            rel="noreferrer"
+            className="text-zinc-400 hover:text-orange-300"
+          >
+            Remotive
+          </a>{" "}
+          and{" "}
+          <a
+            href="https://jobicy.com"
+            target="_blank"
+            rel="noreferrer"
+            className="text-zinc-400 hover:text-orange-300"
+          >
+            Jobicy
+          </a>
+          . Apply opens the original posting.
+        </p>
       </div>
     </div>
   );
